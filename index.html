@@ -607,4 +607,614 @@ function renderLegoList() {
     filtered
       .map(createLegoCard)
       .join('');
+
+}
+
+
+/* =========================
+   카드 생성
+========================= */
+
+function createLegoCard(item) {
+
+  const number =
+    item['레고 품번'] || '-';
+
+
+  const name =
+    item['레고명'] || '이름 없음';
+
+
+  const releasePrice =
+    toNumber(item['출시가']);
+
+
+  const ownership =
+    item['보유 여부'] || '미보유';
+
+
+  const boxStatus =
+    item['박스 여부'] || '-';
+
+
+  const purchasePrice =
+    toNumber(item['매입가']);
+
+
+  const soldPrice =
+    toNumber(item['되판 가격']);
+
+
+  const memo =
+    item['메모'] || '';
+
+
+  let badgeClass =
+    'not-owned';
+
+
+  if (ownership === '보유') {
+    badgeClass = 'owned';
+  }
+
+
+  if (ownership === '판매함') {
+    badgeClass = 'sold';
+  }
+
+
+  /*
+   * 사진 URL이 시트에 있는 경우에만
+   * 사진을 표시합니다.
+   *
+   * 사진이 없으면 큰 빈 영역을
+   * 아예 만들지 않습니다.
+   */
+
+  const imageUrl =
+    item['사진 URL'] || '';
+
+
+  let imageHtml = '';
+
+
+  if (imageUrl) {
+
+    imageHtml = `
+
+      <div class="lego-image">
+
+        <img
+          src="${escapeHtml(imageUrl)}"
+          alt="${escapeHtml(name)}"
+          onerror="this.parentElement.remove();"
+        >
+
+        <span class="status-badge ${badgeClass}">
+          ${escapeHtml(ownership)}
+        </span>
+
+      </div>
+
+    `;
+
+  }
+
+
+  return `
+
+    <article class="lego-card">
+
+
+      ${imageHtml}
+
+
+      <div class="lego-info">
+
+        <div class="lego-number">
+          #${escapeHtml(number)}
+        </div>
+
+
+        <h3>
+          ${escapeHtml(name)}
+        </h3>
+
+
+        <div class="info-row">
+
+          <span>출시가</span>
+
+          <strong>
+            ${formatWon(releasePrice)}
+          </strong>
+
+        </div>
+
+
+        <div class="info-row">
+
+          <span>매입가</span>
+
+          <strong>
+            ${formatWon(purchasePrice)}
+          </strong>
+
+        </div>
+
+
+        ${
+          ownership === '판매함'
+            ? `
+
+              <div class="info-row sold-price">
+
+                <span>
+                  되판 가격
+                </span>
+
+                <strong>
+                  ${formatWon(soldPrice)}
+                </strong>
+
+              </div>
+
+            `
+            : ''
+        }
+
+
+        <div class="info-row">
+
+          <span>박스</span>
+
+          <strong>
+            ${escapeHtml(boxStatus)}
+          </strong>
+
+        </div>
+
+
+        ${
+          memo
+            ? `
+
+              <div class="tags">
+
+                <span class="tag">
+                  ${escapeHtml(memo)}
+                </span>
+
+              </div>
+
+            `
+            : ''
+        }
+
+      </div>
+
+    </article>
+
+  `;
+
+}
+
+
+/* =========================
+   보기 방식 변경
+========================= */
+
+function changeView(view) {
+
+  currentView = view;
+
+
+  const grid =
+    document.getElementById('legoGrid');
+
+
+  const cardButton =
+    document.getElementById(
+      'cardViewButton'
+    );
+
+
+  const listButton =
+    document.getElementById(
+      'listViewButton'
+    );
+
+
+  if (view === 'card') {
+
+    grid.classList.add('card-mode');
+    grid.classList.remove('list-mode');
+
+    cardButton.classList.add('active');
+    listButton.classList.remove('active');
+
+  } else {
+
+    grid.classList.add('list-mode');
+    grid.classList.remove('card-mode');
+
+    cardButton.classList.remove('active');
+    listButton.classList.add('active');
+
+  }
+
+}
+
+
+/* =========================
+   요약 계산
+========================= */
+
+function updateSummary() {
+
+  const owned =
+    legoList.filter(function(item) {
+
+      return item['보유 여부'] === '보유';
+
+    });
+
+
+  const totalPurchase =
+    legoList.reduce(function(total, item) {
+
+      return total +
+        toNumber(item['매입가']);
+
+    }, 0);
+
+
+  const priceDifference =
+    legoList.reduce(function(total, item) {
+
+      return total +
+        (
+          toNumber(item['출시가']) -
+          toNumber(item['매입가'])
+        );
+
+    }, 0);
+
+
+  const totalValue =
+    owned.reduce(function(total, item) {
+
+      return total +
+        toNumber(item['출시가']);
+
+    }, 0);
+
+
+  document.getElementById(
+    'ownedCount'
+  ).textContent =
+    owned.length + '개';
+
+
+  document.getElementById(
+    'totalPurchase'
+  ).textContent =
+    formatWon(totalPurchase);
+
+
+  document.getElementById(
+    'priceDifference'
+  ).textContent =
+    formatWon(priceDifference);
+
+
+  document.getElementById(
+    'totalValue'
+  ).textContent =
+    formatWon(totalValue);
+
+}
+
+
+/* =========================
+   저장
+========================= */
+
+async function saveLego(event) {
+
+  event.preventDefault();
+
+
+  const button =
+    event.target.querySelector(
+      'button[type="submit"]'
+    );
+
+
+  button.disabled = true;
+  button.textContent = '저장 중...';
+
+
+  const data = {
+
+    '레고 품번':
+      document.getElementById(
+        'legoNumber'
+      ).value.trim(),
+
+    '레고명':
+      document.getElementById(
+        'legoName'
+      ).value.trim(),
+
+    '출시가':
+      document.getElementById(
+        'releasePrice'
+      ).value,
+
+    '보유 여부':
+      document.getElementById(
+        'ownership'
+      ).value,
+
+    '박스 여부':
+      document.getElementById(
+        'boxStatus'
+      ).value,
+
+    '매입가':
+      document.getElementById(
+        'purchasePrice'
+      ).value,
+
+    '되판 가격':
+      document.getElementById(
+        'soldPrice'
+      ).value,
+
+    '메모':
+      document.getElementById(
+        'memo'
+      ).value.trim()
+
+  };
+
+
+  try {
+
+    const response =
+      await fetch(
+        API_URL,
+        {
+
+          method: 'POST',
+
+          headers: {
+
+            'Content-Type':
+              'text/plain;charset=utf-8'
+
+          },
+
+          body:
+            JSON.stringify(data)
+
+        }
+      );
+
+
+    const result =
+      await response.json();
+
+
+    if (!result.success) {
+
+      throw new Error(
+        result.error ||
+        '저장에 실패했습니다.'
+      );
+
+    }
+
+
+    alert(
+      '레고가 저장되었습니다! 🪄'
+    );
+
+
+    document
+      .getElementById('legoForm')
+      .reset();
+
+
+    closeAddModal();
+
+
+    await loadLegoData();
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      '저장하지 못했습니다.\n\n' +
+      error.message
+    );
+
+  } finally {
+
+    button.disabled = false;
+    button.textContent = '저장하기';
+
+  }
+
+}
+
+
+/* =========================
+   모달
+========================= */
+
+function openAddModal() {
+
+  document
+    .getElementById('addModal')
+    .classList.add('show');
+
+}
+
+
+function closeAddModal() {
+
+  document
+    .getElementById('addModal')
+    .classList.remove('show');
+
+}
+
+
+function closeModalBackground(event) {
+
+  if (
+    event.target.id === 'addModal'
+  ) {
+
+    closeAddModal();
+
+  }
+
+}
+
+
+/* =========================
+   숫자 변환
+========================= */
+
+function toNumber(value) {
+
+  if (
+    value === null ||
+    value === undefined ||
+    value === ''
+  ) {
+
+    return 0;
+
+  }
+
+
+  return Number(
+    String(value)
+      .replace(/,/g, '')
+      .replace(/원/g, '')
+  ) || 0;
+
+}
+
+
+/* =========================
+   원화 표시
+========================= */
+
+function formatWon(value) {
+
+  return (
+    Math.round(value)
+      .toLocaleString('ko-KR')
+    + '원'
+  );
+
+}
+
+
+/* =========================
+   HTML 안전 처리
+========================= */
+
+function escapeHtml(value) {
+
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+
+}
+
+
+/* =========================
+   로딩
+========================= */
+
+function showLoading() {
+
+  document.getElementById(
+    'legoGrid'
+  ).innerHTML = `
+
+    <div class="empty-state">
+
+      <div class="empty-icon">
+        ✨
+      </div>
+
+      <h3>
+        레고 목록을 불러오는 중...
+      </h3>
+
+      <p>
+        잠시만 기다려주세요.
+      </p>
+
+    </div>
+
+  `;
+
+}
+
+
+/* =========================
+   오류
+========================= */
+
+function showError(message) {
+
+  document.getElementById(
+    'legoGrid'
+  ).innerHTML = `
+
+    <div class="empty-state">
+
+      <div class="empty-icon">
+        ⚡
+      </div>
+
+      <h3>
+        불러오지 못했습니다.
+      </h3>
+
+      <p>
+        ${message}
+      </p>
+
+      <button
+        type="button"
+        class="primary-button retry-button"
+        onclick="loadLegoData()"
+      >
+        다시 불러오기
+      </button>
+
+    </div>
+
+  `;
+
+}
+
+</script>
+
+</body>
+</html>
 ```
