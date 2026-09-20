@@ -1,226 +1,763 @@
+```html
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Harry Potter LEGO Collection</title>
+  <title>Hogwarts LEGO Collection</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-  <header class="header">
-    <div class="header-inner">
-      <a href="index.html" class="logo">⚡ LEGO COLLECTION</a>
+<header class="header">
+  <div class="header-inner">
 
-      <nav class="nav">
-        <a href="index.html" class="active">레고 목록</a>
-        <a href="detail.html">상세 보기</a>
-      </nav>
+    <div class="logo">
+      🪄 Hogwarts LEGO Collection
     </div>
-  </header>
 
-  <main class="container">
+    <nav class="nav">
+      <a href="#" class="active">컬렉션</a>
+    </nav>
 
-    <section class="page-title">
-      <div>
-        <p class="eyebrow">HARRY POTTER COLLECTION</p>
-        <h1>나의 레고 목록</h1>
-        <p class="description">
-          내가 모은 해리포터 레고를 한눈에 확인해보세요.
-        </p>
-      </div>
+  </div>
+</header>
 
-      <a href="detail.html" class="primary-button">＋ 레고 등록</a>
-    </section>
 
-    <section class="summary">
-      <div class="summary-card">
-        <span class="summary-label">전체 레고</span>
-        <strong>3개</strong>
-      </div>
+<main class="container">
 
-      <div class="summary-card">
-        <span class="summary-label">보유 중</span>
-        <strong>2개</strong>
-      </div>
+  <section class="page-title">
 
-      <div class="summary-card">
-        <span class="summary-label">판매함</span>
-        <strong>1개</strong>
-      </div>
+    <div>
+      <p class="eyebrow">MY HARRY POTTER LEGO</p>
 
-      <div class="summary-card highlight">
-        <span class="summary-label">전체 매입 금액</span>
-        <strong>₩485,000</strong>
-      </div>
-    </section>
+      <h1>나의 레고 컬렉션</h1>
 
-    <section class="toolbar">
+      <p class="description">
+        내가 가진 해리포터 레고와 구매·판매 기록을 한눈에 관리하세요.
+      </p>
+    </div>
 
-      <div class="search-box">
-        <span>⌕</span>
-        <input type="text" placeholder="품번이나 레고명을 검색해보세요">
-      </div>
+    <button
+      type="button"
+      class="primary-button"
+      onclick="openAddModal()"
+    >
+      ＋ 레고 추가
+    </button>
 
-      <select>
-        <option>전체 상태</option>
-        <option>보유</option>
-        <option>판매함</option>
-        <option>미보유</option>
-      </select>
+  </section>
 
-      <select>
-        <option>정렬: 최신 등록순</option>
-        <option>매입가 낮은순</option>
-        <option>매입가 높은순</option>
-        <option>출시가 낮은순</option>
-        <option>출시가 높은순</option>
-      </select>
 
-    </section>
+  <!-- 요약 정보 -->
+
+  <section class="summary">
+
+    <div class="summary-card gryffindor">
+      <span class="summary-label">보유 레고</span>
+      <strong id="ownedCount">0개</strong>
+    </div>
+
+    <div class="summary-card slytherin">
+      <span class="summary-label">전체 매입 금액</span>
+      <strong id="totalPurchase">0원</strong>
+    </div>
+
+    <div class="summary-card ravenclaw">
+      <span class="summary-label">출시가와 매입가 차이</span>
+      <strong id="priceDifference">0원</strong>
+    </div>
+
+    <div class="summary-card highlight">
+      <span class="summary-label">보유 레고 총 가치</span>
+      <strong id="totalValue">0원</strong>
+    </div>
+
+  </section>
+
+
+  <!-- 검색 / 정렬 -->
+
+  <section class="toolbar">
+
+    <div class="search-box">
+
+      <span>⌕</span>
+
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="품번이나 레고명을 검색하세요"
+        oninput="renderLegoList()"
+      >
+
+    </div>
+
+
+    <select id="statusFilter" onchange="renderLegoList()">
+
+      <option value="전체">보유 여부 전체</option>
+      <option value="보유">보유</option>
+      <option value="판매함">판매함</option>
+      <option value="미보유">미보유</option>
+
+    </select>
+
+
+    <select id="sortSelect" onchange="renderLegoList()">
+
+      <option value="default">기본순</option>
+      <option value="number">품번순</option>
+      <option value="name">이름순</option>
+      <option value="releaseHigh">출시가 높은순</option>
+      <option value="releaseLow">출시가 낮은순</option>
+      <option value="purchaseHigh">매입가 높은순</option>
+      <option value="purchaseLow">매입가 낮은순</option>
+
+    </select>
+
+  </section>
+
+
+  <section>
 
     <div class="view-title">
-      <h2>전체 레고 <span>3</span></h2>
-      <div class="view-buttons">
-        <button class="view-button active">▦ 카드</button>
-        <button class="view-button">☷ 목록</button>
-      </div>
+
+      <h2>
+        레고 목록
+        <span id="legoCount">0</span>
+      </h2>
+
     </div>
 
-    <section class="lego-grid">
 
-      <!-- LEGO 1 -->
-      <article class="lego-card">
+    <div
+      class="lego-grid"
+      id="legoGrid"
+    ></div>
 
-        <div class="lego-image">
+  </section>
+
+</main>
+
+
+<footer class="footer">
+
+  <p>Hogwarts LEGO Collection</p>
+
+  <span>
+    나만의 해리포터 레고 기록장
+  </span>
+
+</footer>
+
+
+<!-- =========================
+     레고 추가 모달
+========================= -->
+
+<div
+  class="modal"
+  id="addModal"
+  onclick="closeModalBackground(event)"
+>
+
+  <div class="modal-box">
+
+    <div class="modal-header">
+
+      <h2>레고 추가</h2>
+
+      <button
+        type="button"
+        class="modal-close"
+        onclick="closeAddModal()"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <form id="legoForm">
+
+      <label>
+        레고 품번
+
+        <input
+          type="text"
+          id="legoNumber"
+          placeholder="예: 76391"
+          required
+        >
+
+      </label>
+
+
+      <label>
+        레고명
+
+        <input
+          type="text"
+          id="legoName"
+          placeholder="예: 호그와트 아이콘"
+          required
+        >
+
+      </label>
+
+
+      <label>
+        출시가
+
+        <input
+          type="number"
+          id="releasePrice"
+          placeholder="예: 399900"
+          min="0"
+        >
+
+      </label>
+
+
+      <label>
+        보유 여부
+
+        <select id="ownership">
+
+          <option value="보유">보유</option>
+          <option value="판매함">판매함</option>
+          <option value="미보유">미보유</option>
+
+        </select>
+
+      </label>
+
+
+      <label>
+        박스 여부
+
+        <select id="boxStatus">
+
+          <option value="박스 있음">박스 있음</option>
+          <option value="박스 없음">박스 없음</option>
+
+        </select>
+
+      </label>
+
+
+      <label>
+        매입가
+
+        <input
+          type="number"
+          id="purchasePrice"
+          placeholder="예: 350000"
+          min="0"
+        >
+
+      </label>
+
+
+      <label>
+        되판 가격
+
+        <input
+          type="number"
+          id="soldPrice"
+          placeholder="실제로 판매했을 때만 입력"
+          min="0"
+        >
+
+      </label>
+
+
+      <label>
+        메모
+
+        <textarea
+          id="memo"
+          rows="4"
+          placeholder="박스 상태, 구매처 등을 적어주세요."
+        ></textarea>
+
+      </label>
+
+
+      <div class="modal-actions">
+
+        <button
+          type="button"
+          class="secondary-button"
+          onclick="closeAddModal()"
+        >
+          취소
+        </button>
+
+        <button
+          type="submit"
+          class="primary-button"
+        >
+          저장하기
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+<script>
+
+  /* =========================
+     Apps Script 웹앱 주소
+  ========================= */
+
+  const API_URL =
+    'https://script.google.com/macros/s/AKfycbynG6GdKR3sd9JDH_fMTM9LOx637JIxqjd_DA5XxmxSG93w-9UJTfh5RDSqGTrm3ndR7Q/exec';
+
+
+  /* =========================
+     현재 레고 데이터
+  ========================= */
+
+  let legoList = [];
+
+
+  /* =========================
+     페이지 시작
+  ========================= */
+
+  document.addEventListener(
+    'DOMContentLoaded',
+    function() {
+
+      loadLegoData();
+
+      document
+        .getElementById('legoForm')
+        .addEventListener(
+          'submit',
+          saveLego
+        );
+
+    }
+  );
+
+
+  /* =========================
+     스프레드시트에서 데이터 가져오기
+  ========================= */
+
+  async function loadLegoData() {
+
+    showLoading();
+
+    try {
+
+      const response =
+        await fetch(API_URL);
+
+      const result =
+        await response.json();
+
+      if (!result.success) {
+        throw new Error(
+          result.error || '데이터를 불러오지 못했습니다.'
+        );
+      }
+
+      legoList =
+        Array.isArray(result.data)
+          ? result.data
+          : [];
+
+      renderLegoList();
+      updateSummary();
+
+    } catch (error) {
+
+      console.error(error);
+
+      showError(
+        '레고 목록을 불러오지 못했습니다.<br>' +
+        'Apps Script 배포 설정과 주소를 확인해주세요.'
+      );
+
+    }
+
+  }
+
+
+  /* =========================
+     레고 목록 화면 표시
+  ========================= */
+
+  function renderLegoList() {
+
+    const grid =
+      document.getElementById('legoGrid');
+
+    const keyword =
+      document
+        .getElementById('searchInput')
+        .value
+        .trim()
+        .toLowerCase();
+
+    const status =
+      document
+        .getElementById('statusFilter')
+        .value;
+
+    const sort =
+      document
+        .getElementById('sortSelect')
+        .value;
+
+
+    let filtered =
+      legoList.filter(function(item) {
+
+        const number =
+          String(item['레고 품번'] || '')
+            .toLowerCase();
+
+        const name =
+          String(item['레고명'] || '')
+            .toLowerCase();
+
+        const matchesSearch =
+          !keyword ||
+          number.includes(keyword) ||
+          name.includes(keyword);
+
+        const matchesStatus =
+          status === '전체' ||
+          String(item['보유 여부'] || '') === status;
+
+        return (
+          matchesSearch &&
+          matchesStatus
+        );
+
+      });
+
+
+    filtered.sort(function(a, b) {
+
+      switch (sort) {
+
+        case 'number':
+          return String(a['레고 품번'] || '')
+            .localeCompare(
+              String(b['레고 품번'] || ''),
+              undefined,
+              { numeric: true }
+            );
+
+        case 'name':
+          return String(a['레고명'] || '')
+            .localeCompare(
+              String(b['레고명'] || ''),
+              'ko'
+            );
+
+        case 'releaseHigh':
+          return toNumber(b['출시가']) -
+                 toNumber(a['출시가']);
+
+        case 'releaseLow':
+          return toNumber(a['출시가']) -
+                 toNumber(b['출시가']);
+
+        case 'purchaseHigh':
+          return toNumber(b['매입가']) -
+                 toNumber(a['매입가']);
+
+        case 'purchaseLow':
+          return toNumber(a['매입가']) -
+                 toNumber(b['매입가']);
+
+        default:
+          return 0;
+
+      }
+
+    });
+
+
+    document.getElementById(
+      'legoCount'
+    ).textContent =
+      filtered.length;
+
+
+    if (filtered.length === 0) {
+
+      grid.innerHTML = `
+        <div class="empty-state">
+
+          <div class="empty-icon">🧱</div>
+
+          <h3>아직 레고가 없습니다.</h3>
+
+          <p>
+            오른쪽 위의 '레고 추가' 버튼으로
+            첫 번째 레고를 등록해보세요.
+          </p>
+
+        </div>
+      `;
+
+      return;
+
+    }
+
+
+    grid.innerHTML =
+      filtered
+        .map(createLegoCard)
+        .join('');
+
+  }
+
+
+  /* =========================
+     레고 카드 만들기
+  ========================= */
+
+  function createLegoCard(item) {
+
+    const number =
+      item['레고 품번'] || '-';
+
+    const name =
+      item['레고명'] || '이름 없음';
+
+    const releasePrice =
+      toNumber(item['출시가']);
+
+    const ownership =
+      item['보유 여부'] || '미보유';
+
+    const boxStatus =
+      item['박스 여부'] || '-';
+
+    const purchasePrice =
+      toNumber(item['매입가']);
+
+    const soldPrice =
+      toNumber(item['되판 가격']);
+
+    const memo =
+      item['메모'] || '';
+
+
+    let badgeClass =
+      'not-owned';
+
+    if (ownership === '보유') {
+      badgeClass = 'owned';
+    }
+
+    if (ownership === '판매함') {
+      badgeClass = 'sold';
+    }
+
+
+    /*
+      현재는 레고 사진 URL을
+      별도 사진 데이터 없이 자동으로 만들지 않습니다.
+
+      사진 URL을 시트에 추가하는 방식으로
+      다음 단계에서 확장할 수 있습니다.
+    */
+
+    const imageUrl =
+      item['사진 URL'] || '';
+
+
+    const imageHtml =
+      imageUrl
+        ? `
+          <img
+            src="${escapeHtml(imageUrl)}"
+            alt="${escapeHtml(name)}"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+          >
+
+          <div class="image-placeholder fallback">
+            🧱
+          </div>
+        `
+        : `
           <div class="image-placeholder">
-            🏰
-            <small>LEGO IMAGE</small>
+            🧱
           </div>
-
-          <span class="status-badge owned">보유</span>
-        </div>
-
-        <div class="lego-info">
-
-          <p class="lego-number">76391</p>
-
-          <h3>호그와트 아이콘</h3>
-
-          <div class="info-row">
-            <span>출시가</span>
-            <strong>₩399,900</strong>
-          </div>
-
-          <div class="info-row">
-            <span>매입가</span>
-            <strong>₩350,000</strong>
-          </div>
-
-          <div class="tags">
-            <span class="tag">박스 있음</span>
-          </div>
-
-          <a href="detail.html" class="detail-link">
-            상세 보기 →
-          </a>
-
-        </div>
-      </article>
+        `;
 
 
-      <!-- LEGO 2 -->
+    return `
       <article class="lego-card">
 
         <div class="lego-image">
-          <div class="image-placeholder blue">
-            🧙
-            <small>LEGO IMAGE</small>
-          </div>
 
-          <span class="status-badge owned">보유</span>
+          ${imageHtml}
+
+          <span class="status-badge ${badgeClass}">
+            ${escapeHtml(ownership)}
+          </span>
+
         </div>
+
 
         <div class="lego-info">
 
-          <p class="lego-number">75978</p>
+          <div class="lego-number">
+            #${escapeHtml(number)}
+          </div>
 
-          <h3>다이애건 앨리</h3>
+          <h3>
+            ${escapeHtml(name)}
+          </h3>
+
 
           <div class="info-row">
+
             <span>출시가</span>
-            <strong>₩599,900</strong>
+
+            <strong>
+              ${formatWon(releasePrice)}
+            </strong>
+
           </div>
 
+
           <div class="info-row">
+
             <span>매입가</span>
-            <strong>₩580,000</strong>
+
+            <strong>
+              ${formatWon(purchasePrice)}
+            </strong>
+
           </div>
 
-          <div class="tags">
-            <span class="tag">박스 있음</span>
-          </div>
 
-          <a href="detail.html" class="detail-link">
-            상세 보기 →
-          </a>
+          ${
+            ownership === '판매함'
+              ? `
+                <div class="info-row sold-price">
 
-        </div>
-      </article>
+                  <span>되판 가격</span>
 
+                  <strong>
+                    ${formatWon(soldPrice)}
+                  </strong>
 
-      <!-- LEGO 3 -->
-      <article class="lego-card">
+                </div>
+              `
+              : ''
+          }
 
-        <div class="lego-image">
-          <div class="image-placeholder purple">
-            🪄
-            <small>LEGO IMAGE</small>
-          </div>
-
-          <span class="status-badge sold">판매함</span>
-        </div>
-
-        <div class="lego-info">
-
-          <p class="lego-number">71043</p>
-
-          <h3>호그와트 성</h3>
 
           <div class="info-row">
-            <span>출시가</span>
-            <strong>₩549,900</strong>
+
+            <span>박스</span>
+
+            <strong>
+              ${escapeHtml(boxStatus)}
+            </strong>
+
           </div>
 
-          <div class="info-row">
-            <span>매입가</span>
-            <strong>₩485,000</strong>
-          </div>
 
-          <div class="info-row sold-price">
-            <span>되판 가격</span>
-            <strong>₩520,000</strong>
-          </div>
+          ${
+            memo
+              ? `
+                <div class="tags">
 
-          <div class="tags">
-            <span class="tag">박스 없음</span>
-          </div>
+                  <span class="tag">
+                    ${escapeHtml(memo)}
+                  </span>
 
-          <a href="detail.html" class="detail-link">
-            상세 보기 →
-          </a>
+                </div>
+              `
+              : ''
+          }
 
         </div>
+
       </article>
+    `;
 
-    </section>
+  }
 
-  </main>
 
-  <footer class="footer">
-    <p>Harry Potter LEGO Collection</p>
-    <span>나만의 레고 컬렉션을 기록해보세요.</span>
-  </footer>
+  /* =========================
+     요약 정보 계산
+  ========================= */
 
-</body>
-</html>
+  function updateSummary() {
+
+    const owned =
+      legoList.filter(function(item) {
+
+        return item['보유 여부'] === '보유';
+
+      });
+
+
+    const totalPurchase =
+      legoList.reduce(function(total, item) {
+
+        return total +
+          toNumber(item['매입가']);
+
+      }, 0);
+
+
+    const priceDifference =
+      legoList.reduce(function(total, item) {
+
+        return total +
+          (
+            toNumber(item['출시가']) -
+            toNumber(item['매입가'])
+          );
+
+      }, 0);
+
+
+    const totalValue =
+      owned.reduce(function(total, item) {
+
+        return total +
+          toNumber(item['출시가']);
+
+      }, 0);
+
+
+    document.getElementById(
+      'ownedCount'
+    ).textContent =
+      owned.length + '개';
+
+
+    document.getElementById(
+      'totalPurchase'
+    ).textContent =
+      formatWon(totalPurchase);
+
+
+    document.getElementById(
+      'priceDifference'
+    ).textContent =
+      formatWon(priceDifference
+```
