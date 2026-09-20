@@ -173,7 +173,7 @@
 
 
 <!-- =========================
-     레고 추가 모달
+     레고 추가/수정 모달
 ========================= -->
 
 <div
@@ -186,7 +186,7 @@
 
     <div class="modal-header">
 
-      <h2>레고 추가</h2>
+      <h2 id="modalTitle">레고 추가</h2>
 
       <button
         type="button"
@@ -403,7 +403,22 @@
 
     </div>
 
+    <!-- 수정 / 삭제 / 닫기 버튼 영역 -->
     <div class="modal-actions">
+      <button
+        type="button"
+        class="secondary-button"
+        onclick="editCurrentLego()"
+      >
+        수정
+      </button>
+      <button
+        type="button"
+        class="delete-button"
+        onclick="deleteCurrentLego()"
+      >
+        삭제
+      </button>
       <button
         type="button"
         class="secondary-button"
@@ -429,11 +444,12 @@
 
 
   /* =========================
-     현재 레고 데이터 및 보기 방식
+     현재 레고 데이터 및 상태
   ========================= */
 
   let legoList = [];
   let currentViewMode = 'grid'; // 'grid' 또는 'list'
+  let currentDetailIndex = null; // 현재 상세 모달에서 열린 레고의 인덱스
 
 
   /* =========================
@@ -469,11 +485,9 @@
     const number = String(item['레고 품번'] || '').trim();
     if (!number) return '';
 
-    // 숫자 형태만 정제 (예: '76391-1' 또는 '76391' -> '76391')
     const cleanNumber = number.replace(/[^0-9]/g, '');
     if (!cleanNumber) return '';
 
-    // 레고 공식 CDN 서버 표준 포맷 주소
     return `https://images.brickset.com/sets/images/${cleanNumber}-1.jpg`;
   }
 
@@ -488,11 +502,9 @@
 
     try {
 
-      const response =
-        await fetch(API_URL);
+      const response = await fetch(API_URL);
 
-      const result =
-        await response.json();
+      const result = await response.json();
 
       if (!result.success) {
         throw new Error(
@@ -500,10 +512,7 @@
         );
       }
 
-      legoList =
-        Array.isArray(result.data)
-          ? result.data
-          : [];
+      legoList = Array.isArray(result.data) ? result.data : [];
 
       renderLegoList();
       updateSummary();
@@ -553,53 +562,26 @@
 
   function renderLegoList() {
 
-    const grid =
-      document.getElementById('legoGrid');
+    const grid = document.getElementById('legoGrid');
 
-    const keyword =
-      document
-        .getElementById('searchInput')
-        .value
-        .trim()
-        .toLowerCase();
+    const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
 
-    const status =
-      document
-        .getElementById('statusFilter')
-        .value;
+    const status = document.getElementById('statusFilter').value;
 
-    const sort =
-      document
-        .getElementById('sortSelect')
-        .value;
+    const sort = document.getElementById('sortSelect').value;
 
 
-    let filtered =
-      legoList.filter(function(item) {
+    let filtered = legoList.filter(function(item) {
 
-        const number =
-          String(item['레고 품번'] || '')
-            .toLowerCase();
+      const number = String(item['레고 품번'] || '').toLowerCase();
+      const name = String(item['레고명'] || '').toLowerCase();
 
-        const name =
-          String(item['레고명'] || '')
-            .toLowerCase();
+      const matchesSearch = !keyword || number.includes(keyword) || name.includes(keyword);
+      const matchesStatus = status === '전체' || String(item['보유 여부'] || '') === status;
 
-        const matchesSearch =
-          !keyword ||
-          number.includes(keyword) ||
-          name.includes(keyword);
+      return matchesSearch && matchesStatus;
 
-        const matchesStatus =
-          status === '전체' ||
-          String(item['보유 여부'] || '') === status;
-
-        return (
-          matchesSearch &&
-          matchesStatus
-        );
-
-      });
+    });
 
 
     filtered.sort(function(a, b) {
@@ -607,35 +589,29 @@
       switch (sort) {
 
         case 'number':
-          return String(a['레고 품번'] || '')
-            .localeCompare(
-              String(b['레고 품번'] || ''),
-              undefined,
-              { numeric: true }
-            );
+          return String(a['레고 품번'] || '').localeCompare(
+            String(b['레고 품번'] || ''),
+            undefined,
+            { numeric: true }
+          );
 
         case 'name':
-          return String(a['레고명'] || '')
-            .localeCompare(
-              String(b['레고명'] || ''),
-              'ko'
-            );
+          return String(a['레고명'] || '').localeCompare(
+            String(b['레고명'] || ''),
+            'ko'
+          );
 
         case 'releaseHigh':
-          return toNumber(b['출시가']) -
-                 toNumber(a['출시가']);
+          return toNumber(b['출시가']) - toNumber(a['출시가']);
 
         case 'releaseLow':
-          return toNumber(a['출시가']) -
-                 toNumber(b['출시가']);
+          return toNumber(a['출시가']) - toNumber(b['출시가']);
 
         case 'purchaseHigh':
-          return toNumber(b['매입가']) -
-                 toNumber(a['매입가']);
+          return toNumber(b['매입가']) - toNumber(a['매입가']);
 
         case 'purchaseLow':
-          return toNumber(a['매입가']) -
-                 toNumber(b['매입가']);
+          return toNumber(a['매입가']) - toNumber(b['매입가']);
 
         default:
           return 0;
@@ -645,26 +621,16 @@
     });
 
 
-    document.getElementById(
-      'legoCount'
-    ).textContent =
-      filtered.length;
+    document.getElementById('legoCount').textContent = filtered.length;
 
 
     if (filtered.length === 0) {
 
       grid.innerHTML = `
         <div class="empty-state">
-
           <div class="empty-icon">🧱</div>
-
           <h3>아직 레고가 없습니다.</h3>
-
-          <p>
-            오른쪽 위의 '레고 추가' 버튼으로
-            첫 번째 레고를 등록해보세요.
-          </p>
-
+          <p>오른쪽 위의 '레고 추가' 버튼으로 첫 번째 레고를 등록해보세요.</p>
         </div>
       `;
 
@@ -673,91 +639,59 @@
     }
 
 
-    grid.innerHTML =
-      filtered
-        .map((item, index) => createLegoCard(item, index))
-        .join('');
+    grid.innerHTML = filtered
+      .map((item) => {
+        // 원래 데이터(legoList) 내에서의 index 찾기
+        const originalIndex = legoList.indexOf(item);
+        return createLegoCard(item, originalIndex);
+      })
+      .join('');
 
   }
 
 
   /* =========================
-     레고 카드/목록 구성 요소 생성
+     레고 카드 생성
   ========================= */
 
   function createLegoCard(item, index) {
 
-    const number =
-      item['레고 품번'] || '-';
+    const number = item['레고 품번'] || '-';
+    const name = item['레고명'] || '이름 없음';
+    const releasePrice = toNumber(item['출시가']);
+    const ownership = item['보유 여부'] || '미보유';
+    const boxStatus = item['박스 여부'] || '-';
+    const purchasePrice = toNumber(item['매입가']);
+    const soldPrice = toNumber(item['되판 가격']);
+    const memo = item['메모'] || '';
 
-    const name =
-      item['레고명'] || '이름 없음';
-
-    const releasePrice =
-      toNumber(item['출시가']);
-
-    const ownership =
-      item['보유 여부'] || '미보유';
-
-    const boxStatus =
-      item['박스 여부'] || '-';
-
-    const purchasePrice =
-      toNumber(item['매입가']);
-
-    const soldPrice =
-      toNumber(item['되판 가격']);
-
-    const memo =
-      item['메모'] || '';
-
-
-    let badgeClass =
-      'not-owned';
-
-    if (ownership === '보유') {
-      badgeClass = 'owned';
-    }
-
-    if (ownership === '판매함') {
-      badgeClass = 'sold';
-    }
+    let badgeClass = 'not-owned';
+    if (ownership === '보유') badgeClass = 'owned';
+    if (ownership === '판매함') badgeClass = 'sold';
 
     const imageUrl = getLegoImageUrl(item);
 
-    const imageHtml =
-      imageUrl
-        ? `
-          <img
-            src="${escapeHtml(imageUrl)}"
-            alt="${escapeHtml(name)}"
-            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-          >
-
-          <div class="image-placeholder fallback" style="display:none;">
-            🧱
-          </div>
-        `
-        : `
-          <div class="image-placeholder">
-            🧱
-          </div>
-        `;
+    const imageHtml = imageUrl
+      ? `
+        <img
+          src="${escapeHtml(imageUrl)}"
+          alt="${escapeHtml(name)}"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+        >
+        <div class="image-placeholder fallback" style="display:none;">🧱</div>
+      `
+      : `<div class="image-placeholder">🧱</div>`;
 
 
     return `
       <article class="lego-card" onclick="openDetailModal(${index})">
 
         <div class="lego-image">
-
           ${imageHtml}
-
           <span class="status-badge ${badgeClass}">
             ${escapeHtml(ownership)}
           </span>
-
         </div>
-
 
         <div class="lego-info">
 
@@ -765,70 +699,39 @@
             #${escapeHtml(number)}
           </div>
 
-          <h3>
-            ${escapeHtml(name)}
-          </h3>
-
+          <h3>${escapeHtml(name)}</h3>
 
           <div class="info-row">
-
             <span>출시가</span>
-
-            <strong>
-              ${formatWon(releasePrice)}
-            </strong>
-
+            <strong>${formatWon(releasePrice)}</strong>
           </div>
-
 
           <div class="info-row">
-
             <span>매입가</span>
-
-            <strong>
-              ${formatWon(purchasePrice)}
-            </strong>
-
+            <strong>${formatWon(purchasePrice)}</strong>
           </div>
-
 
           ${
             ownership === '판매함'
               ? `
                 <div class="info-row sold-price">
-
                   <span>되판 가격</span>
-
-                  <strong>
-                    ${formatWon(soldPrice)}
-                  </strong>
-
+                  <strong>${formatWon(soldPrice)}</strong>
                 </div>
               `
               : ''
           }
 
-
           <div class="info-row">
-
             <span>박스</span>
-
-            <strong>
-              ${escapeHtml(boxStatus)}
-            </strong>
-
+            <strong>${escapeHtml(boxStatus)}</strong>
           </div>
-
 
           ${
             memo
               ? `
                 <div class="tags">
-
-                  <span class="tag">
-                    ${escapeHtml(memo)}
-                  </span>
-
+                  <span class="tag">${escapeHtml(memo)}</span>
                 </div>
               `
               : ''
@@ -848,191 +751,75 @@
 
   function updateSummary() {
 
-    const owned =
-      legoList.filter(function(item) {
+    const owned = legoList.filter(item => item['보유 여부'] === '보유');
 
-        return item['보유 여부'] === '보유';
+    const totalPurchase = legoList.reduce((total, item) => total + toNumber(item['매입가']), 0);
 
-      });
+    const priceDifference = legoList.reduce((total, item) => {
+      return total + (toNumber(item['출시가']) - toNumber(item['매입가']));
+    }, 0);
 
-
-    const totalPurchase =
-      legoList.reduce(function(total, item) {
-
-        return total +
-          toNumber(item['매입가']);
-
-      }, 0);
+    const totalValue = owned.reduce((total, item) => total + toNumber(item['출시가']), 0);
 
 
-    const priceDifference =
-      legoList.reduce(function(total, item) {
-
-        return total +
-          (
-            toNumber(item['출시가']) -
-            toNumber(item['매입가'])
-          );
-
-      }, 0);
-
-
-    const totalValue =
-      owned.reduce(function(total, item) {
-
-        return total +
-          toNumber(item['출시가']);
-
-      }, 0);
-
-
-    document.getElementById(
-      'ownedCount'
-    ).textContent =
-      owned.length + '개';
-
-
-    document.getElementById(
-      'totalPurchase'
-    ).textContent =
-      formatWon(totalPurchase);
-
-
-    document.getElementById(
-      'priceDifference'
-    ).textContent =
-      formatWon(priceDifference);
-
-
-    document.getElementById(
-      'totalValue'
-    ).textContent =
-      formatWon(totalValue);
+    document.getElementById('ownedCount').textContent = owned.length + '개';
+    document.getElementById('totalPurchase').textContent = formatWon(totalPurchase);
+    document.getElementById('priceDifference').textContent = formatWon(priceDifference);
+    document.getElementById('totalValue').textContent = formatWon(totalValue);
 
   }
 
 
   /* =========================
-     레고 저장
+     레고 저장 (추가 / 수정 공용)
   ========================= */
 
   async function saveLego(event) {
 
     event.preventDefault();
 
-
-    const button =
-      event.target.querySelector(
-        'button[type="submit"]'
-      );
-
+    const button = event.target.querySelector('button[type="submit"]');
 
     button.disabled = true;
     button.textContent = '저장 중...';
 
-
     const data = {
-
-      '레고 품번':
-        document.getElementById(
-          'legoNumber'
-        ).value.trim(),
-
-      '레고명':
-        document.getElementById(
-          'legoName'
-        ).value.trim(),
-
-      '출시가':
-        document.getElementById(
-          'releasePrice'
-        ).value,
-
-      '보유 여부':
-        document.getElementById(
-          'ownership'
-        ).value,
-
-      '박스 여부':
-        document.getElementById(
-          'boxStatus'
-        ).value,
-
-      '매입가':
-        document.getElementById(
-          'purchasePrice'
-        ).value,
-
-      '되판 가격':
-        document.getElementById(
-          'soldPrice'
-        ).value,
-
-      '메모':
-        document.getElementById(
-          'memo'
-        ).value.trim()
-
+      '레고 품번': document.getElementById('legoNumber').value.trim(),
+      '레고명': document.getElementById('legoName').value.trim(),
+      '출시가': document.getElementById('releasePrice').value,
+      '보유 여부': document.getElementById('ownership').value,
+      '박스 여부': document.getElementById('boxStatus').value,
+      '매입가': document.getElementById('purchasePrice').value,
+      '되판 가격': document.getElementById('soldPrice').value,
+      '메모': document.getElementById('memo').value.trim()
     };
-
 
     try {
 
-      const response =
-        await fetch(
-          API_URL,
-          {
-            method: 'POST',
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8'
+        },
+        body: JSON.stringify(data)
+      });
 
-            headers: {
-              'Content-Type':
-                'text/plain;charset=utf-8'
-            },
-
-            body:
-              JSON.stringify(data)
-
-          }
-        );
-
-
-      const result =
-        await response.json();
-
+      const result = await response.json();
 
       if (!result.success) {
-
-        throw new Error(
-          result.error ||
-          '저장에 실패했습니다.'
-        );
-
+        throw new Error(result.error || '저장에 실패했습니다.');
       }
 
+      alert('레고가 성공적으로 저장되었습니다! 🪄');
 
-      alert(
-        '레고가 저장되었습니다! 🪄'
-      );
-
-
-      document
-        .getElementById('legoForm')
-        .reset();
-
-
+      document.getElementById('legoForm').reset();
       closeAddModal();
-
       await loadLegoData();
-
 
     } catch (error) {
 
       console.error(error);
-
-      alert(
-        '저장하지 못했습니다.\n\n' +
-        error.message
-      );
+      alert('저장하지 못했습니다.\n\n' + error.message);
 
     } finally {
 
@@ -1045,23 +832,17 @@
 
 
   /* =========================
-     레고 추가 모달 조작
+     레고 추가 / 수정 모달 조작
   ========================= */
 
   function openAddModal() {
-
-    document
-      .getElementById('addModal')
-      .classList.add('show');
-
+    document.getElementById('modalTitle').textContent = '레고 추가';
+    document.getElementById('addModal').classList.add('show');
   }
 
   function closeAddModal() {
-
-    document
-      .getElementById('addModal')
-      .classList.remove('show');
-
+    document.getElementById('legoForm').reset();
+    document.getElementById('addModal').classList.remove('show');
   }
 
 
@@ -1070,17 +851,19 @@
   ========================= */
 
   function openDetailModal(index) {
+    currentDetailIndex = index;
     const item = legoList[index];
     if (!item) return;
 
     const imageUrl = getLegoImageUrl(item);
     const detailImg = document.getElementById('detailImage');
+    const imgWrapper = detailImg.parentElement;
     
     if (imageUrl) {
       detailImg.src = imageUrl;
-      detailImg.style.display = 'block';
+      imgWrapper.style.display = 'flex';
     } else {
-      detailImg.style.display = 'none';
+      imgWrapper.style.display = 'none';
     }
 
     document.getElementById('detailNumber').textContent = '#' + (item['레고 품번'] || '-');
@@ -1110,6 +893,81 @@
 
   function closeDetailModal() {
     document.getElementById('detailModal').classList.remove('show');
+    currentDetailIndex = null;
+  }
+
+
+  /* =========================
+     상세 화면 내 [수정] 기능
+  ========================= */
+
+  function editCurrentLego() {
+    if (currentDetailIndex === null) return;
+    const item = legoList[currentDetailIndex];
+    if (!item) return;
+
+    // 모달 타이틀 변경
+    document.getElementById('modalTitle').textContent = '레고 수정';
+
+    // 폼 입력창에 기존 데이터 채우기
+    document.getElementById('legoNumber').value = item['레고 품번'] || '';
+    document.getElementById('legoName').value = item['레고명'] || '';
+    document.getElementById('releasePrice').value = item['출시가'] || '';
+    document.getElementById('ownership').value = item['보유 여부'] || '보유';
+    document.getElementById('boxStatus').value = item['박스 여부'] || '박스 있음';
+    document.getElementById('purchasePrice').value = item['매입가'] || '';
+    document.getElementById('soldPrice').value = item['되판 가격'] || '';
+    document.getElementById('memo').value = item['메모'] || '';
+
+    // 상세 모달 닫고 수정 폼 모달 띄우기
+    closeDetailModal();
+    document.getElementById('addModal').classList.add('show');
+  }
+
+
+  /* =========================
+     상세 화면 내 [삭제] 기능
+  ========================= */
+
+  async function deleteCurrentLego() {
+    if (currentDetailIndex === null) return;
+    const item = legoList[currentDetailIndex];
+    if (!item) return;
+
+    const confirmDelete = confirm(`'${item['레고명']}' 레고를 opravdu 삭제하시겠습니까?`);
+    if (!confirmDelete) return;
+
+    try {
+      showLoading();
+
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8'
+        },
+        body: JSON.stringify({
+          action: 'delete',
+          '레고 품번': item['레고 품번']
+        })
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || '삭제 처리에 실패했습니다.');
+      }
+
+      alert('삭제되었습니다!');
+      closeDetailModal();
+      await loadLegoData();
+
+    } catch (error) {
+
+      console.error(error);
+      alert('삭제 중 오류가 발생했습니다.\n\n' + error.message);
+      renderLegoList();
+
+    }
   }
 
 
@@ -1118,12 +976,10 @@
   ========================= */
 
   function closeModalBackground(event, modalId) {
-
     if (event.target.id === modalId) {
       if (modalId === 'addModal') closeAddModal();
       if (modalId === 'detailModal') closeDetailModal();
     }
-
   }
 
 
@@ -1132,42 +988,27 @@
   ========================= */
 
   function toNumber(value) {
-
-    if (
-      value === null ||
-      value === undefined ||
-      value === ''
-    ) {
+    if (value === null || value === undefined || value === '') {
       return 0;
     }
-
     return Number(
       String(value)
         .replace(/,/g, '')
         .replace(/원/g, '')
     ) || 0;
-
   }
 
   function formatWon(value) {
-
-    return (
-      Math.round(value)
-        .toLocaleString('ko-KR')
-      + '원'
-    );
-
+    return Math.round(value).toLocaleString('ko-KR') + '원';
   }
 
   function escapeHtml(value) {
-
     return String(value)
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
-
   }
 
 
@@ -1176,44 +1017,21 @@
   ========================= */
 
   function showLoading() {
-
-    document.getElementById(
-      'legoGrid'
-    ).innerHTML = `
+    document.getElementById('legoGrid').innerHTML = `
       <div class="empty-state">
-
-        <div class="empty-icon loading">
-          ✨
-        </div>
-
+        <div class="empty-icon loading">✨</div>
         <h3>레고 목록을 불러오는 중...</h3>
-
-        <p>
-          잠시만 기다려주세요.
-        </p>
-
+        <p>잠시만 기다려주세요.</p>
       </div>
     `;
-
   }
 
   function showError(message) {
-
-    document.getElementById(
-      'legoGrid'
-    ).innerHTML = `
+    document.getElementById('legoGrid').innerHTML = `
       <div class="empty-state">
-
-        <div class="empty-icon">
-          ⚡
-        </div>
-
+        <div class="empty-icon">⚡</div>
         <h3>불러오지 못했습니다.</h3>
-
-        <p>
-          ${message}
-        </p>
-
+        <p>${message}</p>
         <button
           type="button"
           class="primary-button retry-button"
@@ -1221,10 +1039,8 @@
         >
           다시 불러오기
         </button>
-
       </div>
     `;
-
   }
 
 </script>
