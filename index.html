@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Harry Potter LEGO Collection</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">⚡ LEGO COLLECTION</a>
+
+      <nav class="nav">
+        <a href="index.html" class="active">레고 목록</a>
+        <a href="detail.html">상세 보기</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section class="page-title">
+      <div>
+        <p class="eyebrow">HARRY POTTER COLLECTION</p>
+        <h1>나의 레고 목록</h1>
+        <p class="description">
+          내가 모은 해리포터 레고를 한눈에 확인해보세요.
+        </p>
+      </div>
+
+      <a href="detail.html" class="primary-button">＋ 레고 등록</a>
+    </section>
+
+    <section class="summary">
+      <div class="summary-card">
+        <span class="summary-label">전체 레고</span>
+        <strong>3개</strong>
+      </div>
+
+      <div class="summary-card">
+        <span class="summary-label">보유 중</span>
+        <strong>2개</strong>
+      </div>
+
+      <div class="summary-card">
+        <span class="summary-label">판매함</span>
+        <strong>1개</strong>
+      </div>
+
+      <div class="summary-card highlight">
+        <span class="summary-label">전체 매입 금액</span>
+        <strong>₩485,000</strong>
+      </div>
+    </section>
+
+    <section class="toolbar">
+
+      <div class="search-box">
+        <span>⌕</span>
+        <input type="text" placeholder="품번이나 레고명을 검색해보세요">
+      </div>
+
+      <select>
+        <option>전체 상태</option>
+        <option>보유</option>
+        <option>판매함</option>
+        <option>미보유</option>
+      </select>
+
+      <select>
+        <option>정렬: 최신 등록순</option>
+        <option>매입가 낮은순</option>
+        <option>매입가 높은순</option>
+        <option>출시가 낮은순</option>
+        <option>출시가 높은순</option>
+      </select>
+
+    </section>
+
+    <div class="view-title">
+      <h2>전체 레고 <span>3</span></h2>
+      <div class="view-buttons">
+        <button class="view-button active">▦ 카드</button>
+        <button class="view-button">☷ 목록</button>
+      </div>
+    </div>
+
+    <section class="lego-grid">
+
+      <!-- LEGO 1 -->
+      <article class="lego-card">
+
+        <div class="lego-image">
+          <div class="image-placeholder">
+            🏰
+            <small>LEGO IMAGE</small>
+          </div>
+
+          <span class="status-badge owned">보유</span>
+        </div>
+
+        <div class="lego-info">
+
+          <p class="lego-number">76391</p>
+
+          <h3>호그와트 아이콘</h3>
+
+          <div class="info-row">
+            <span>출시가</span>
+            <strong>₩399,900</strong>
+          </div>
+
+          <div class="info-row">
+            <span>매입가</span>
+            <strong>₩350,000</strong>
+          </div>
+
+          <div class="tags">
+            <span class="tag">박스 있음</span>
+          </div>
+
+          <a href="detail.html" class="detail-link">
+            상세 보기 →
+          </a>
+
+        </div>
+      </article>
+
+
+      <!-- LEGO 2 -->
+      <article class="lego-card">
+
+        <div class="lego-image">
+          <div class="image-placeholder blue">
+            🧙
+            <small>LEGO IMAGE</small>
+          </div>
+
+          <span class="status-badge owned">보유</span>
+        </div>
+
+        <div class="lego-info">
+
+          <p class="lego-number">75978</p>
+
+          <h3>다이애건 앨리</h3>
+
+          <div class="info-row">
+            <span>출시가</span>
+            <strong>₩599,900</strong>
+          </div>
+
+          <div class="info-row">
+            <span>매입가</span>
+            <strong>₩580,000</strong>
+          </div>
+
+          <div class="tags">
+            <span class="tag">박스 있음</span>
+          </div>
+
+          <a href="detail.html" class="detail-link">
+            상세 보기 →
+          </a>
+
+        </div>
+      </article>
+
+
+      <!-- LEGO 3 -->
+      <article class="lego-card">
+
+        <div class="lego-image">
+          <div class="image-placeholder purple">
+            🪄
+            <small>LEGO IMAGE</small>
+          </div>
+
+          <span class="status-badge sold">판매함</span>
+        </div>
+
+        <div class="lego-info">
+
+          <p class="lego-number">71043</p>
+
+          <h3>호그와트 성</h3>
+
+          <div class="info-row">
+            <span>출시가</span>
+            <strong>₩549,900</strong>
+          </div>
+
+          <div class="info-row">
+            <span>매입가</span>
+            <strong>₩485,000</strong>
+          </div>
+
+          <div class="info-row sold-price">
+            <span>되판 가격</span>
+            <strong>₩520,000</strong>
+          </div>
+
+          <div class="tags">
+            <span class="tag">박스 없음</span>
+          </div>
+
+          <a href="detail.html" class="detail-link">
+            상세 보기 →
+          </a>
+
+        </div>
+      </article>
+
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <p>Harry Potter LEGO Collection</p>
+    <span>나만의 레고 컬렉션을 기록해보세요.</span>
+  </footer>
+
+</body>
+</html>
