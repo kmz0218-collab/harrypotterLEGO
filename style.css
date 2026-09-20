@@ -1,18 +1,31 @@
+```css
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap');
 
 :root {
   --cream: #faf7f1;
   --cream-dark: #f1ece2;
   --white: #ffffff;
+
   --brown: #3d332c;
   --brown-light: #76685d;
+
   --gold: #b88a3b;
   --gold-light: #f4ead5;
-  --red: #a94b4b;
-  --red-light: #f8e7e5;
-  --green: #56765e;
-  --green-light: #e8f0e8;
+
+  --red: #a83b32;
+  --red-light: #f8e5e2;
+
+  --blue: #416a8a;
+  --blue-light: #e4edf5;
+
+  --green: #52735d;
+  --green-light: #e6f0e8;
+
+  --purple: #705a82;
+  --purple-light: #eee8f2;
+
   --border: #e6dfd4;
+
   --shadow: 0 8px 25px rgba(66, 52, 39, 0.07);
 }
 
@@ -26,7 +39,11 @@ html {
 
 body {
   margin: 0;
-  background: var(--cream);
+  background:
+    radial-gradient(circle at 10% 10%, rgba(184, 138, 59, 0.08), transparent 25%),
+    radial-gradient(circle at 90% 30%, rgba(112, 90, 130, 0.06), transparent 25%),
+    var(--cream);
+
   color: var(--brown);
   font-family: 'Noto Sans KR', sans-serif;
   line-height: 1.6;
@@ -47,17 +64,21 @@ button {
   cursor: pointer;
 }
 
+
 /* =========================
    HEADER
 ========================= */
 
 .header {
   height: 72px;
-  background: rgba(255, 255, 255, 0.95);
+
+  background: rgba(255, 255, 255, 0.96);
   border-bottom: 1px solid var(--border);
+
   position: sticky;
   top: 0;
   z-index: 10;
+
   backdrop-filter: blur(10px);
 }
 
@@ -76,6 +97,18 @@ button {
   font-size: 17px;
   font-weight: 800;
   letter-spacing: 0.03em;
+
+  background: linear-gradient(
+    90deg,
+    #a83b32,
+    #b88a3b,
+    #416a8a,
+    #52735d
+  );
+
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .nav {
@@ -85,8 +118,10 @@ button {
 
 .nav a {
   padding: 9px 15px;
+
   color: var(--brown-light);
   border-radius: 8px;
+
   font-size: 14px;
   font-weight: 600;
 }
@@ -96,6 +131,7 @@ button {
   background: var(--gold-light);
   color: var(--brown);
 }
+
 
 /* =========================
    COMMON
@@ -111,12 +147,14 @@ button {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
+
   gap: 30px;
   margin-bottom: 38px;
 }
 
 .eyebrow {
   margin: 0 0 7px;
+
   color: var(--gold);
   font-size: 12px;
   font-weight: 800;
@@ -132,12 +170,14 @@ p {
 
 h1 {
   margin-bottom: 8px;
+
   font-size: 36px;
   letter-spacing: -0.04em;
 }
 
 .description {
   margin: 0;
+
   color: var(--brown-light);
   font-size: 15px;
 }
@@ -148,20 +188,25 @@ h1 {
   justify-content: center;
 
   padding: 13px 20px;
-  background: var(--brown);
+
+  background: linear-gradient(135deg, #3d332c, #624d3d);
   color: white;
+
   border-radius: 10px;
 
   font-size: 14px;
   font-weight: 700;
 
+  box-shadow: 0 6px 15px rgba(61, 51, 44, 0.15);
+
   transition: 0.2s;
 }
 
 .primary-button:hover {
-  background: #58483c;
+  background: linear-gradient(135deg, #624d3d, #7d5d45);
   transform: translateY(-1px);
 }
+
 
 /* =========================
    SUMMARY
@@ -171,25 +216,66 @@ h1 {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 14px;
+
   margin-bottom: 32px;
 }
 
 .summary-card {
   padding: 20px;
+
   background: var(--white);
+
   border: 1px solid var(--border);
   border-radius: 13px;
+
   box-shadow: var(--shadow);
+
+  position: relative;
+  overflow: hidden;
+}
+
+.summary-card::before {
+  content: "";
+
+  position: absolute;
+  left: 0;
+  top: 0;
+
+  width: 5px;
+  height: 100%;
+}
+
+.summary-card.gryffindor::before {
+  background: var(--red);
+}
+
+.summary-card.slytherin::before {
+  background: var(--green);
+}
+
+.summary-card.ravenclaw::before {
+  background: var(--blue);
 }
 
 .summary-card.highlight {
-  background: var(--gold-light);
+  background: linear-gradient(
+    135deg,
+    #f7edda,
+    #fff9ee
+  );
+
   border-color: #e6d5b5;
+}
+
+.summary-card.highlight::before {
+  background: var(--gold);
 }
 
 .summary-label {
   display: block;
+
   margin-bottom: 7px;
+
   color: var(--brown-light);
   font-size: 13px;
 }
@@ -198,6 +284,7 @@ h1 {
   font-size: 23px;
 }
 
+
 /* =========================
    TOOLBAR
 ========================= */
@@ -205,12 +292,15 @@ h1 {
 .toolbar {
   display: flex;
   gap: 10px;
+
   margin-bottom: 38px;
 }
 
 .search-box {
   flex: 1;
+
   height: 46px;
+
   display: flex;
   align-items: center;
   gap: 9px;
@@ -218,8 +308,11 @@ h1 {
   padding: 0 14px;
 
   background: white;
+
   border: 1px solid var(--border);
   border-radius: 9px;
+
+  box-shadow: 0 3px 10px rgba(66, 52, 39, 0.03);
 }
 
 .search-box span {
@@ -229,9 +322,12 @@ h1 {
 
 .search-box input {
   width: 100%;
+
   border: 0;
   outline: none;
+
   background: transparent;
+
   color: var(--brown);
   font-size: 14px;
 }
@@ -239,16 +335,20 @@ h1 {
 .toolbar select {
   min-width: 150px;
   height: 46px;
+
   padding: 0 13px;
 
   background: white;
+
   border: 1px solid var(--border);
   border-radius: 9px;
 
   color: var(--brown);
+
   font-size: 13px;
   outline: none;
 }
+
 
 /* =========================
    LIST TITLE
@@ -258,16 +358,19 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   margin-bottom: 18px;
 }
 
 .view-title h2 {
   margin: 0;
+
   font-size: 20px;
 }
 
 .view-title h2 span {
   margin-left: 5px;
+
   color: var(--gold);
 }
 
@@ -278,18 +381,24 @@ h1 {
 
 .view-button {
   padding: 7px 12px;
+
   background: transparent;
+
   border: 1px solid transparent;
   border-radius: 7px;
+
   color: var(--brown-light);
   font-size: 12px;
 }
 
 .view-button.active {
   background: white;
+
   border-color: var(--border);
+
   color: var(--brown);
 }
+
 
 /* =========================
    LEGO CARD
@@ -297,73 +406,76 @@ h1 {
 
 .lego-grid {
   display: grid;
+
   grid-template-columns: repeat(3, 1fr);
   gap: 22px;
 }
 
 .lego-card {
   overflow: hidden;
+
   background: white;
+
   border: 1px solid var(--border);
   border-radius: 15px;
+
   box-shadow: var(--shadow);
+
   transition: 0.2s;
 }
 
 .lego-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 14px 32px rgba(66, 52, 39, 0.11);
+  transform: translateY(-4px);
+
+  box-shadow:
+    0 16px 35px rgba(66, 52, 39, 0.12);
 }
 
 .lego-image {
   height: 235px;
+
   position: relative;
   overflow: hidden;
+
+  background:
+    linear-gradient(
+      135deg,
+      #f2eee7,
+      #e6dfd4
+    );
 }
 
-.image-placeholder {
+.lego-image img {
   width: 100%;
   height: 100%;
 
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  display: block;
 
-  background: #e9dfcd;
-  color: #947b59;
+  object-fit: contain;
 
-  font-size: 68px;
+  padding: 12px;
+
+  transition: transform 0.3s ease;
 }
 
-.image-placeholder.blue {
-  background: #e4e8eb;
-  color: #596b78;
-}
-
-.image-placeholder.purple {
-  background: #e7e0e8;
-  color: #725e75;
-}
-
-.image-placeholder small {
-  margin-top: 6px;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  opacity: 0.6;
+.lego-card:hover .lego-image img {
+  transform: scale(1.04);
 }
 
 .status-badge {
   position: absolute;
+
   top: 13px;
   right: 13px;
 
   padding: 5px 9px;
+
   border-radius: 20px;
 
   font-size: 11px;
   font-weight: 700;
+
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
 }
 
 .status-badge.owned {
@@ -378,8 +490,11 @@ h1 {
 
 .status-badge.large {
   position: static;
+
   display: inline-block;
+
   padding: 7px 13px;
+
   font-size: 12px;
 }
 
@@ -389,14 +504,18 @@ h1 {
 
 .lego-number {
   margin-bottom: 3px;
+
   color: var(--gold);
+
   font-size: 12px;
   font-weight: 700;
+
   letter-spacing: 0.05em;
 }
 
 .lego-info h3 {
   margin-bottom: 19px;
+
   font-size: 18px;
   letter-spacing: -0.03em;
 }
@@ -407,6 +526,7 @@ h1 {
   align-items: center;
 
   padding: 7px 0;
+
   border-top: 1px solid #f0ece6;
 
   font-size: 13px;
@@ -430,24 +550,40 @@ h1 {
 
 .tag {
   display: inline-block;
+
   padding: 4px 8px;
 
-  background: #f5f2ed;
   border-radius: 5px;
 
-  color: var(--brown-light);
   font-size: 10px;
   font-weight: 600;
 }
 
+.gryffindor-tag {
+  background: var(--red-light);
+  color: var(--red);
+}
+
+.ravenclaw-tag {
+  background: var(--blue-light);
+  color: var(--blue);
+}
+
+.slytherin-tag {
+  background: var(--green-light);
+  color: var(--green);
+}
+
 .detail-link {
   display: block;
+
   margin-top: 18px;
   padding-top: 14px;
 
   border-top: 1px solid var(--border);
 
   color: var(--brown);
+
   font-size: 13px;
   font-weight: 700;
 }
@@ -455,6 +591,7 @@ h1 {
 .detail-link:hover {
   color: var(--gold);
 }
+
 
 /* =========================
    DETAIL PAGE
@@ -466,9 +603,11 @@ h1 {
 
 .back-link {
   display: inline-block;
+
   margin-bottom: 30px;
 
   color: var(--brown-light);
+
   font-size: 13px;
   font-weight: 600;
 }
@@ -479,8 +618,10 @@ h1 {
 
 .detail-layout {
   display: grid;
+
   grid-template-columns: 48% 52%;
   gap: 55px;
+
   align-items: start;
 }
 
@@ -489,33 +630,36 @@ h1 {
   top: 105px;
 }
 
-.large-image-placeholder {
+.large-product-image {
+  width: 100%;
   aspect-ratio: 1 / 1;
 
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  display: block;
 
-  background: #e9dfcd;
+  object-fit: contain;
+
+  padding: 20px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #f2eee7,
+      #e4edf5,
+      #eee8f2
+    );
+
   border-radius: 18px;
 
-  color: #947b59;
-  font-size: 110px;
-}
-
-.large-image-placeholder span {
-  margin-top: 10px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  opacity: 0.6;
+  box-shadow: var(--shadow);
 }
 
 .image-note {
   margin: 12px 0 0;
+
   color: #988e83;
+
   font-size: 11px;
+
   text-align: center;
 }
 
@@ -523,6 +667,7 @@ h1 {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+
   gap: 20px;
 
   margin-bottom: 25px;
@@ -530,12 +675,15 @@ h1 {
 
 .detail-header h1 {
   margin: 0;
+
   font-size: 32px;
 }
 
 .detail-box {
   overflow: hidden;
+
   background: white;
+
   border: 1px solid var(--border);
   border-radius: 12px;
 }
@@ -543,9 +691,11 @@ h1 {
 .detail-row {
   display: flex;
   justify-content: space-between;
+
   gap: 30px;
 
   padding: 16px 20px;
+
   border-bottom: 1px solid #eee9e2;
 
   font-size: 14px;
@@ -570,14 +720,22 @@ h1 {
 
 .price-analysis {
   margin-top: 16px;
+
   padding: 19px 20px;
 
-  background: var(--gold-light);
+  background:
+    linear-gradient(
+      135deg,
+      #f7edda,
+      #edf5ed
+    );
+
   border-radius: 11px;
 }
 
 .price-analysis div {
   display: flex;
+
   justify-content: space-between;
   align-items: center;
 }
@@ -588,12 +746,15 @@ h1 {
 
 .price-analysis strong {
   color: var(--green);
+
   font-size: 19px;
 }
 
 .price-analysis p {
   margin: 5px 0 0;
+
   color: var(--brown-light);
+
   font-size: 11px;
 }
 
@@ -603,48 +764,61 @@ h1 {
 
 .memo h2 {
   margin-bottom: 11px;
+
   font-size: 17px;
 }
 
 .memo-box {
   min-height: 100px;
+
   padding: 15px;
 
   background: white;
+
   border: 1px solid var(--border);
   border-radius: 10px;
 
   color: var(--brown-light);
+
   font-size: 13px;
 }
 
 .detail-actions {
   display: flex;
+
   gap: 9px;
+
   margin-top: 25px;
 }
 
 .secondary-button,
 .delete-button {
   flex: 1;
+
   height: 45px;
 
   border-radius: 9px;
+
   font-size: 13px;
   font-weight: 700;
 }
 
 .secondary-button {
   background: var(--brown);
+
   border: 1px solid var(--brown);
+
   color: white;
 }
 
 .delete-button {
   background: white;
+
   border: 1px solid #e1c9c6;
+
   color: var(--red);
 }
+
 
 /* =========================
    FOOTER
@@ -656,21 +830,27 @@ h1 {
   border-top: 1px solid var(--border);
 
   color: var(--brown-light);
+
   text-align: center;
+
   font-size: 12px;
 }
 
 .footer p {
   margin-bottom: 3px;
+
   color: var(--brown);
+
   font-weight: 700;
 }
+
 
 /* =========================
    RESPONSIVE
 ========================= */
 
 @media (max-width: 850px) {
+
   .summary {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -681,22 +861,28 @@ h1 {
 
   .detail-layout {
     grid-template-columns: 1fr;
+
     gap: 35px;
   }
 
   .detail-image {
     position: static;
   }
+
 }
 
+
 @media (max-width: 600px) {
+
   .header {
     height: auto;
   }
 
   .header-inner {
     padding: 14px 18px;
+
     flex-direction: column;
+
     gap: 10px;
   }
 
@@ -714,6 +900,7 @@ h1 {
 
   .page-title .primary-button {
     margin-top: 20px;
+
     width: 100%;
   }
 
@@ -749,7 +936,9 @@ h1 {
     font-size: 27px;
   }
 
-  .large-image-placeholder {
-    font-size: 80px;
+  .large-product-image {
+    padding: 10px;
   }
+
 }
+```
