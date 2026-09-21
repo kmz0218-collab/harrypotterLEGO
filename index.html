@@ -3,694 +3,548 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Harry Potter LEGO Collection</title>
-  <link rel="stylesheet" href="style.css">
+  <title>레고 컬렉션 관리자</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    body { font-family: 'Pretendard', sans-serif; }
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+    }
+  </style>
 </head>
+<body class="bg-slate-100 text-slate-800 min-h-screen pb-12">
 
-<body>
-
-<header class="header">
-  <div class="header-inner">
-    <div class="logo">
-      <span class="logo-icon">🪄</span> Harry Potter LEGO Collection
-    </div>
-  </div>
-</header>
-
-<main class="container">
-
-  <section class="page-title">
-    <div>
-      <p class="eyebrow">HOGWARTS ARCHIVES</p>
-      <h1>마법 레고 서고</h1>
-      <p class="description">
-        수집하신 해리포터 레고의 보관 현황과 거래 기록을 관리하세요.
-      </p>
-    </div>
-
-    <button
-      type="button"
-      class="primary-button"
-      onclick="openAddModal()"
-    >
-      ＋ 레고 봉인 해제 (추가)
-    </button>
-  </section>
-
-  <!-- 요약 정보 -->
-  <section class="summary">
-    <div class="summary-card card-green">
-      <span class="summary-label">보유 중인 레고</span>
-      <strong id="ownedCount">0개</strong>
-    </div>
-
-    <div class="summary-card card-blue">
-      <span class="summary-label">총 투자 금화 (매입가)</span>
-      <strong id="totalPurchase">0원</strong>
-    </div>
-
-    <div class="summary-card card-red">
-      <span class="summary-label">출시가 대비 차액</span>
-      <strong id="priceDifference">0원</strong>
-    </div>
-
-    <div class="summary-card card-purple">
-      <span class="summary-label">보유 레고 총 가치</span>
-      <strong id="totalValue">0원</strong>
-    </div>
-  </section>
-
-  <!-- 검색 / 정렬 / 보기 설정 -->
-  <section class="toolbar">
-    <div class="search-box">
-      <span>⌕</span>
-      <input
-        type="text"
-        id="searchInput"
-        placeholder="품번이나 레고 이름을 입력하세요..."
-        oninput="resetAndRender()"
-      >
-    </div>
-
-    <select id="statusFilter" onchange="resetAndRender()">
-      <option value="전체">보유 상태 전체</option>
-      <option value="보유">보유</option>
-      <option value="판매함">판매함</option>
-      <option value="미보유">미보유</option>
-    </select>
-
-    <select id="sortSelect" onchange="resetAndRender()">
-      <option value="number">품번순</option>
-      <option value="name">이름순</option>
-      <option value="releaseHigh">출시가 높은순</option>
-      <option value="releaseLow">출시가 낮은순</option>
-      <option value="purchaseHigh">매입가 높은순</option>
-      <option value="purchaseLow">매입가 낮은순</option>
-    </select>
-
-    <div class="view-toggle-group">
-      <button 
-        type="button" 
-        id="btnCardView" 
-        class="toggle-button active" 
-        onclick="switchView('grid')"
-      >
-        🂠 카드형
-      </button>
-      <button 
-        type="button" 
-        id="btnListView" 
-        class="toggle-button" 
-        onclick="switchView('list')"
-      >
-        ☰ 목록형
-      </button>
-    </div>
-  </section>
-
-  <section>
-    <div class="view-title">
-      <h2>
-        마법 레고 목록
-        <span id="legoCount">0</span>
-      </h2>
-    </div>
-
-    <div class="lego-grid" id="legoGrid"></div>
-
-    <!-- 페이지네이션 컨트롤 -->
-    <div class="pagination" id="paginationControls"></div>
-  </section>
-
-</main>
-
-<footer class="footer">
-  <p>Hogwarts LEGO Archives</p>
-  <span>신비로운 해리포터 레고 컬렉션 기록장</span>
-</footer>
-
-<!-- 레고 추가/수정 모달 -->
-<div class="modal" id="addModal" onclick="closeModalBackground(event, 'addModal')">
-  <div class="modal-box">
-
-    <div class="modal-header">
-      <h2 id="modalTitle">레고 추가</h2>
-      <button type="button" class="modal-close" onclick="closeAddModal()">×</button>
-    </div>
-
-    <form id="legoForm">
-      <label>
-        레고 품번
-        <input type="text" id="legoNumber" placeholder="예: 76391" required>
-      </label>
-
-      <label>
-        레고명
-        <input type="text" id="legoName" placeholder="예: 호그와트 아이콘" required>
-      </label>
-
-      <label>
-        출시가 (원)
-        <input type="number" id="releasePrice" placeholder="예: 399900" min="0">
-      </label>
-
-      <label>
-        보유 여부
-        <select id="ownership">
-          <option value="보유">보유</option>
-          <option value="판매함">판매함</option>
-          <option value="미보유">미보유</option>
-        </select>
-      </label>
-
-      <label>
-        박스 여부
-        <select id="boxStatus">
-          <option value="박스 있음">박스 있음</option>
-          <option value="박스 없음">박스 없음</option>
-        </select>
-      </label>
-
-      <label>
-        매입가 (원)
-        <input type="number" id="purchasePrice" placeholder="예: 350000" min="0">
-      </label>
-
-      <label>
-        되판 가격 (원)
-        <input type="number" id="soldPrice" placeholder="실제 판매한 경우에만 입력" min="0">
-      </label>
-
-      <label>
-        비밀 메모
-        <textarea id="memo" rows="3" placeholder="구매처나 상태 등 기록할 내용을 적어주세요."></textarea>
-      </label>
-
-      <div class="modal-actions">
-        <button type="button" class="secondary-button" onclick="closeAddModal()">취소</button>
-        <button type="submit" class="primary-button">저장하기</button>
+  <!-- 상단 헤더 -->
+  <header class="sticky top-0 z-30 glass-effect border-b border-slate-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="bg-red-500 text-white p-2 rounded-xl shadow-md">
+          <i class="fa-solid me-0 fa-cubes text-xl"></i>
+        </div>
+        <h1 class="text-xl font-bold bg-gradient-to-r from-red-600 to-amber-600 bg-clip-text text-transparent">
+          LEGO Archive
+        </h1>
       </div>
-    </form>
-
-  </div>
-</div>
-
-<!-- 레고 상세 보기 모달 -->
-<div class="modal" id="detailModal" onclick="closeModalBackground(event, 'detailModal')">
-  <div class="modal-box">
-
-    <div class="modal-header">
-      <h2>레고 상세 기록</h2>
-      <button type="button" class="modal-close" onclick="closeDetailModal()">×</button>
-    </div>
-
-    <div class="detail-content">
-      <div class="detail-image-wrapper">
-        <img id="detailImage" src="" alt="레고 이미지">
-      </div>
-
-      <div class="detail-header-info">
-        <span id="detailNumber" class="lego-number-tag"></span>
-        <h3 id="detailName"></h3>
-        <span id="detailBadge" class="status-badge"></span>
-      </div>
-
-      <div class="detail-list">
-        <div class="detail-row">
-          <span>출시가</span>
-          <strong id="detailReleasePrice"></strong>
-        </div>
-
-        <div class="detail-row">
-          <span>매입가</span>
-          <strong id="detailPurchasePrice"></strong>
-        </div>
-
-        <div id="detailSoldRow" class="detail-row sold-price hidden">
-          <span>되판 가격</span>
-          <strong id="detailSoldPrice"></strong>
-        </div>
-
-        <div class="detail-row">
-          <span>박스 상태</span>
-          <strong id="detailBoxStatus"></strong>
-        </div>
-
-        <div class="detail-memo-box">
-          <p class="memo-title">기록된 메모</p>
-          <p id="detailMemo" class="memo-text"></p>
-        </div>
+      <div class="flex items-center space-x-2">
+        <button onclick="fetchData()" class="p-2 text-slate-600 hover:text-red-600 hover:bg-slate-100 rounded-lg transition" title="새로고침">
+          <i class="fa-solid fa-rotate-right"></i>
+        </button>
+        <button onclick="openFormModal()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-sm font-semibold flex items-center shadow-sm transition">
+          <i class="fa-solid fa-plus mr-1.5"></i> 레고 추가
+        </button>
       </div>
     </div>
+  </header>
 
-    <div class="modal-actions">
-      <button type="button" class="secondary-button" onclick="editCurrentLego()">수정</button>
-      <button type="button" class="delete-button" onclick="deleteCurrentLego()">삭제</button>
-      <button type="button" class="secondary-button" onclick="closeDetailModal()">닫기</button>
-    </div>
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
 
-  </div>
-</div>
-
-<script>
-  const API_URL = 'https://script.google.com/macros/s/AKfycbynG6GdKR3sd9JDH_fMTM9LOx637JIxqjd_DA5XxmxSG93w-9UJTfh5RDSqGTrm3ndR7Q/exec';
-
-  let legoList = [];
-  let currentViewMode = 'grid';
-  let currentDetailIndex = null;
-
-  // 페이징 관련 변수 (최대 10개)
-  let currentPage = 1;
-  const ITEMS_PER_PAGE = 10;
-
-  document.addEventListener('DOMContentLoaded', function() {
-    loadLegoData();
-    document.getElementById('legoForm').addEventListener('submit', saveLego);
-  });
-
-  function getLegoImageUrl(item) {
-    if (item['사진 URL'] && item['사진 URL'].trim() !== '') {
-      return item['사진 URL'].trim();
-    }
-    const number = String(item['레고 품번'] || '').trim();
-    if (!number) return '';
-    const cleanNumber = number.replace(/[^0-9]/g, '');
-    if (!cleanNumber) return '';
-    return `https://images.brickset.com/sets/images/${cleanNumber}-1.jpg`;
-  }
-
-  async function loadLegoData() {
-    showLoading();
-    try {
-      const response = await fetch(API_URL);
-      const result = await response.json();
-
-      if (!result.success) {
-        throw new Error(result.error || '마법 기록을 불러오지 못했습니다.');
-      }
-
-      // 데이터 정제 (빈 데이터 제외)
-      legoList = (Array.isArray(result.data) ? result.data : []).filter(item => item['레고 품번'] || item['레고명']);
-
-      renderLegoList();
-      updateSummary();
-
-    } catch (error) {
-      console.error(error);
-      showError('마법 서고의 기록을 불러오지 못했습니다.<br>구글 스크립트 배포 버전을 재확인해주세요.');
-    }
-  }
-
-  function switchView(mode) {
-    currentViewMode = mode;
-    const btnCard = document.getElementById('btnCardView');
-    const btnList = document.getElementById('btnListView');
-    const legoGrid = document.getElementById('legoGrid');
-
-    if (mode === 'list') {
-      btnList.classList.add('active');
-      btnCard.classList.remove('active');
-      legoGrid.classList.add('list-view-mode');
-    } else {
-      btnCard.classList.add('active');
-      btnList.classList.remove('active');
-      legoGrid.classList.remove('list-view-mode');
-    }
-
-    renderLegoList();
-  }
-
-  function resetAndRender() {
-    currentPage = 1;
-    renderLegoList();
-  }
-
-  function renderLegoList() {
-    const grid = document.getElementById('legoGrid');
-    const paginationEl = document.getElementById('paginationControls');
-    const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
-    const status = document.getElementById('statusFilter').value;
-    const sort = document.getElementById('sortSelect').value;
-
-    let filtered = legoList.filter(function(item) {
-      const number = String(item['레고 품번'] || '').toLowerCase();
-      const name = String(item['레고명'] || '').toLowerCase();
-
-      const matchesSearch = !keyword || number.includes(keyword) || name.includes(keyword);
-      const matchesStatus = status === '전체' || String(item['보유 여부'] || '') === status;
-
-      return matchesSearch && matchesStatus;
-    });
-
-    filtered.sort(function(a, b) {
-      switch (sort) {
-        case 'number':
-          return String(a['레고 품번'] || '').localeCompare(String(b['레고 품번'] || ''), undefined, { numeric: true });
-        case 'name':
-          return String(a['레고명'] || '').localeCompare(String(b['레고명'] || ''), 'ko');
-        case 'releaseHigh':
-          return toNumber(b['출시가']) - toNumber(a['출시가']);
-        case 'releaseLow':
-          return toNumber(a['출시가']) - toNumber(b['출시가']);
-        case 'purchaseHigh':
-          return toNumber(b['매입가']) - toNumber(a['매입가']);
-        case 'purchaseLow':
-          return toNumber(a['매입가']) - toNumber(b['매입가']);
-        default:
-          return 0;
-      }
-    });
-
-    document.getElementById('legoCount').textContent = filtered.length;
-
-    if (filtered.length === 0) {
-      grid.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-icon">🏰</div>
-          <h3>기록된 레고가 없습니다.</h3>
-          <p>새로운 마법 레고를 서고에 추가해보세요.</p>
-        </div>
-      `;
-      paginationEl.innerHTML = '';
-      return;
-    }
-
-    // 페이징 계산 (최대 10개)
-    const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
-    if (currentPage > totalPages) currentPage = totalPages;
-    if (currentPage < 1) currentPage = 1;
-
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const pageItems = filtered.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-
-    grid.innerHTML = pageItems
-      .map((item) => {
-        const originalIndex = legoList.indexOf(item);
-        return createLegoCard(item, originalIndex);
-      })
-      .join('');
-
-    renderPagination(totalPages);
-  }
-
-  function renderPagination(totalPages) {
-    const paginationEl = document.getElementById('paginationControls');
-    if (totalPages <= 1) {
-      paginationEl.innerHTML = '';
-      return;
-    }
-
-    let html = `
-      <button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>이전</button>
-    `;
-
-    for (let i = 1; i <= totalPages; i++) {
-      html += `
-        <button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>
-      `;
-    }
-
-    html += `
-      <button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>다음</button>
-    `;
-
-    paginationEl.innerHTML = html;
-  }
-
-  function changePage(page) {
-    currentPage = page;
-    renderLegoList();
-    window.scrollTo({ top: 300, behavior: 'smooth' });
-  }
-
-  function createLegoCard(item, index) {
-    const number = item['레고 품번'] || '-';
-    const name = item['레고명'] || '이름 없음';
-    const releasePrice = toNumber(item['출시가']);
-    const ownership = item['보유 여부'] || '미보유';
-    const purchasePrice = toNumber(item['매입가']);
-
-    let badgeClass = 'not-owned';
-    if (ownership === '보유') badgeClass = 'owned';
-    if (ownership === '판매함') badgeClass = 'sold';
-
-    const imageUrl = getLegoImageUrl(item);
-    const imageHtml = imageUrl
-      ? `
-        <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(name)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-        <div class="image-placeholder fallback" style="display:none;">🪄</div>
-      `
-      : `<div class="image-placeholder">🪄</div>`;
-
-    return `
-      <article class="lego-card" onclick="openDetailModal(${index})">
-        <div class="lego-image">
-          ${imageHtml}
-          <span class="status-badge ${badgeClass}">${escapeHtml(ownership)}</span>
+    <!-- 검색 및 필터 컨트롤 -->
+    <div class="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-slate-200/80 mb-6 space-y-4">
+      <div class="flex flex-col md:flex-row gap-3">
+        <!-- 검색창 -->
+        <div class="relative flex-1">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+          <input type="text" id="searchInput" oninput="handleSearch()" placeholder="품번 또는 레고명 검색..." 
+            class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 text-sm transition">
         </div>
 
-        <div class="lego-info">
-          <div class="lego-number">#${escapeHtml(number)}</div>
-          <h3>${escapeHtml(name)}</h3>
+        <!-- 필터들 -->
+        <div class="flex flex-wrap items-center gap-2">
+          <select id="ownedFilter" onchange="renderList()" class="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-xl px-3 py-2.5 focus:outline-none focus:border-red-500">
+            <option value="ALL">보유 여부: 전체</option>
+            <option value="O">보유 중 (O)</option>
+            <option value="X">미보유 (X)</option>
+          </select>
 
-          <div class="info-row">
-            <span>출시가</span>
-            <strong>${formatWon(releasePrice)}</strong>
-          </div>
+          <select id="boxFilter" onchange="renderList()" class="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-xl px-3 py-2.5 focus:outline-none focus:border-red-500">
+            <option value="ALL">박스 여부: 전체</option>
+            <option value="O">박스 있음 (O)</option>
+            <option value="X">박스 없음 (X)</option>
+          </select>
 
-          <div class="info-row">
-            <span>매입가</span>
-            <strong>${formatWon(purchasePrice)}</strong>
+          <!-- 뷰 모드 변경 -->
+          <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200/60 ml-auto md:ml-0">
+            <button id="viewGridBtn" onclick="setViewMode('grid')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-slate-800 shadow-sm transition">
+              <i class="fa-solid fa-border-all"></i>
+            </button>
+            <button id="viewTableBtn" onclick="setViewMode('table')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-800 transition">
+              <i class="fa-solid fa-list"></i>
+            </button>
           </div>
         </div>
-      </article>
-    `;
-  }
+      </div>
+    </div>
 
-  function updateSummary() {
-    const owned = legoList.filter(item => item['보유 여부'] === '보유');
-    const totalPurchase = legoList.reduce((total, item) => total + toNumber(item['매입가']), 0);
-    const priceDifference = legoList.reduce((total, item) => {
-      return total + (toNumber(item['출시가']) - toNumber(item['매입가']));
-    }, 0);
-    const totalValue = owned.reduce((total, item) => total + toNumber(item['출시가']), 0);
+    <!-- 로딩 상태 -->
+    <div id="loadingState" class="py-20 text-center">
+      <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-slate-200 border-t-red-600 mb-3"></div>
+      <p class="text-slate-500 text-sm font-medium">데이터를 불러오는 중입니다...</p>
+    </div>
 
-    document.getElementById('ownedCount').textContent = owned.length + '개';
-    document.getElementById('totalPurchase').textContent = formatWon(totalPurchase);
-    document.getElementById('priceDifference').textContent = formatWon(priceDifference);
-    document.getElementById('totalValue').textContent = formatWon(totalValue);
-  }
+    <!-- 데이터 목록 영역 -->
+    <div id="contentArea" class="hidden">
+      <!-- 카드 뷰 -->
+      <div id="gridView" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
 
-  async function saveLego(event) {
-    event.preventDefault();
-    const button = event.target.querySelector('button[type="submit"]');
+      <!-- 테이블 뷰 -->
+      <div id="tableView" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-600">
+            <thead class="bg-slate-50 border-b border-slate-200 text-xs text-slate-500 uppercase font-semibold">
+              <tr>
+                <th class="px-4 py-3.5">품번</th>
+                <th class="px-4 py-3.5">레고명</th>
+                <th class="px-4 py-3.5">보유</th>
+                <th class="px-4 py-3.5">박스</th>
+                <th class="px-4 py-3.5 text-right">출시가</th>
+                <th class="px-4 py-3.5 text-right">매입가</th>
+                <th class="px-4 py-3.5 text-right">되판가격</th>
+                <th class="px-4 py-3.5 text-center">관리</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
 
-    button.disabled = true;
-    button.textContent = '마법 주문 기록 중...';
+      <!-- 검색 결과 없음 -->
+      <div id="emptyState" class="hidden py-20 text-center bg-white rounded-2xl border border-slate-200">
+        <i class="fa-solid fa-box-open text-4xl text-slate-300 mb-3"></i>
+        <p class="text-slate-600 font-medium">조건에 일치하는 레고 데이터가 없습니다.</p>
+      </div>
 
-    const data = {
-      '레고 품번': document.getElementById('legoNumber').value.trim(),
-      '레고명': document.getElementById('legoName').value.trim(),
-      '출시가': document.getElementById('releasePrice').value,
-      '보유 여부': document.getElementById('ownership').value,
-      '박스 여부': document.getElementById('boxStatus').value,
-      '매입가': document.getElementById('purchasePrice').value,
-      '되판 가격': document.getElementById('soldPrice').value,
-      '메모': document.getElementById('memo').value.trim()
-    };
+      <!-- 페이지네이션 -->
+      <div id="pagination" class="mt-6 flex items-center justify-between bg-white px-4 py-3 rounded-xl border border-slate-200 text-sm">
+        <button id="prevBtn" onclick="changePage(-1)" class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white transition">
+          <i class="fa-solid fa-chevron-left mr-1"></i> 이전
+        </button>
+        <span id="pageInfo" class="text-slate-500 font-medium">1 / 1 페이지</span>
+        <button id="nextBtn" onclick="changePage(1)" class="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white transition">
+          다음 <i class="fa-solid fa-chevron-right ml-1"></i>
+        </button>
+      </div>
+    </div>
+  </main>
 
-    try {
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(data)
+  <!-- 상세정보 모달 -->
+  <div id="detailModal" class="fixed inset-0 z-50 hidden bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all">
+      <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+        <span id="detailBadge" class="px-2.5 py-1 rounded-md text-xs font-bold bg-slate-100 text-slate-600"></span>
+        <button onclick="closeDetailModal()" class="text-slate-400 hover:text-slate-600 p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="p-6 space-y-4">
+        <div>
+          <p id="detailNumber" class="text-xs text-slate-400 font-semibold mb-0.5"></p>
+          <h3 id="detailName" class="text-xl font-bold text-slate-800"></h3>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs">
+          <div><span class="text-slate-400 block mb-1">출시가</span><strong id="detailRetail" class="text-sm text-slate-700"></strong></div>
+          <div><span class="text-slate-400 block mb-1">매입가</span><strong id="detailPurchase" class="text-sm text-slate-700"></strong></div>
+          <div><span class="text-slate-400 block mb-1">되판 가격</span><strong id="detailResale" class="text-sm text-slate-700"></strong></div>
+          <div><span class="text-slate-400 block mb-1">박스 유무</span><strong id="detailBox" class="text-sm text-slate-700"></strong></div>
+        </div>
+
+        <div>
+          <span class="text-xs text-slate-400 block mb-1">메모</span>
+          <div id="detailMemo" class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-sm text-slate-600 min-h-[60px] whitespace-pre-wrap"></div>
+        </div>
+      </div>
+
+      <div class="p-4 bg-slate-50 border-t border-slate-100 flex justify-between gap-2">
+        <button onclick="deleteCurrentItem()" class="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl text-sm font-semibold transition flex items-center">
+          <i class="fa-solid fa-trash-can mr-1.5"></i> 삭제
+        </button>
+        <div class="flex gap-2">
+          <button onclick="editCurrentItem()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-sm font-semibold transition">
+            수정
+          </button>
+          <button onclick="closeDetailModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-sm font-semibold transition">
+            닫기
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 등록/수정 모달 -->
+  <div id="formModal" class="fixed inset-0 z-50 hidden bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden max-h-[90vh] flex flex-col">
+      <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+        <h3 id="formTitle" class="text-lg font-bold text-slate-800">레고 추가</h3>
+        <button onclick="closeFormModal()" class="text-slate-400 hover:text-slate-600 p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form id="legoForm" onsubmit="handleFormSubmit(event)" class="p-6 overflow-y-auto space-y-4 text-sm flex-1">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">레고 품번 *</label>
+            <input type="text" id="inputNumber" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">레고명 *</label>
+            <input type="text" id="inputName" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">보유 여부</label>
+            <select id="inputOwned" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-red-500">
+              <option value="O">보유 (O)</option>
+              <option value="X">미보유 (X)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">박스 여부</label>
+            <select id="inputBox" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-red-500">
+              <option value="O">있음 (O)</option>
+              <option value="X">없음 (X)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">출시가(원)</label>
+            <input type="number" id="inputRetail" placeholder="0" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-red-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">매입가(원)</label>
+            <input type="number" id="inputPurchase" placeholder="0" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-red-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">되판 가격(원)</label>
+            <input type="number" id="inputResale" placeholder="0" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-red-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">메모</label>
+          <textarea id="inputMemo" rows="3" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-red-500 resize-none"></textarea>
+        </div>
+
+        <div class="pt-2 flex justify-end space-x-2">
+          <button type="button" onclick="closeFormModal()" class="px-4 py-2 border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 transition">취소</button>
+          <button type="submit" id="submitBtn" class="px-5 py-2 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition">저장하기</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // 업데이트된 최신 Apps Script API URL
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxUnBlqaFdTPU35exUbNzXx6weWhpHpGSwAO96-5ot2qbNLupyuga-As1OnJ45oyeBlAw/exec';
+
+    let legoList = [];
+    let filteredList = [];
+    let currentViewMode = 'grid';
+    let currentDetailIndex = null;
+    let currentPage = 1;
+    const ITEMS_PER_PAGE = 12;
+
+    document.addEventListener('DOMContentLoaded', fetchData);
+
+    // 구글 시트 데이터 불러오기
+    function fetchData() {
+      showLoading(true);
+      fetch(API_URL)
+        .then(res => res.json())
+        .then(response => {
+          if (response.success && response.data) {
+            legoList = response.data;
+            applyFilters();
+          } else {
+            alert('데이터를 가져오는데 실패했습니다.');
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          alert('데이터 연결 중 오류가 발생했습니다.');
+        })
+        .finally(() => showLoading(false));
+    }
+
+    function showLoading(isLoading) {
+      document.getElementById('loadingState').classList.toggle('hidden', !isLoading);
+      document.getElementById('contentArea').classList.toggle('hidden', isLoading);
+    }
+
+    // 검색 및 필터링
+    function handleSearch() {
+      currentPage = 1;
+      applyFilters();
+    }
+
+    function applyFilters() {
+      const keyword = document.getElementById('searchInput').value.toLowerCase();
+      const owned = document.getElementById('ownedFilter').value;
+      const box = document.getElementById('boxFilter').value;
+
+      filteredList = legoList.filter(item => {
+        const itemNum = String(item['레고 품번'] || '').toLowerCase();
+        const itemName = String(item['레고명'] || '').toLowerCase();
+        const matchKeyword = itemNum.includes(keyword) || itemName.includes(keyword);
+
+        const itemOwned = String(item['보유 여부'] || '').toUpperCase();
+        const matchOwned = (owned === 'ALL') || (itemOwned === owned);
+
+        const itemBox = String(item['박스 여부'] || '').toUpperCase();
+        const matchBox = (box === 'ALL') || (itemBox === box);
+
+        return matchKeyword && matchOwned && matchBox;
       });
 
-      const result = await response.json();
+      renderList();
+    }
 
-      if (!result.success) {
-        throw new Error(result.error || '기록에 실패했습니다.');
+    // 목록 랜더링
+    function renderList() {
+      const emptyState = document.getElementById('emptyState');
+      const gridView = document.getElementById('gridView');
+      const tableView = document.getElementById('tableView');
+      const tableBody = document.getElementById('tableBody');
+
+      if (filteredList.length === 0) {
+        emptyState.classList.remove('hidden');
+        gridView.classList.add('hidden');
+        tableView.classList.add('hidden');
+        document.getElementById('pagination').classList.add('hidden');
+        return;
       }
 
-      alert('마법 서고에 정상적으로 기록되었습니다! 🪄');
-      document.getElementById('legoForm').reset();
-      closeAddModal();
-      await loadLegoData();
+      emptyState.classList.add('hidden');
+      document.getElementById('pagination').classList.remove('hidden');
 
-    } catch (error) {
-      console.error(error);
-      alert('기록하지 못했습니다.\n\n' + error.message);
-    } finally {
-      button.disabled = false;
-      button.textContent = '저장하기';
+      // 페이지네이션 계산
+      const totalPages = Math.ceil(filteredList.length / ITEMS_PER_PAGE) || 1;
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+      const paginatedItems = filteredList.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+      document.getElementById('pageInfo').innerText = `${currentPage} / ${totalPages} 페이지`;
+      document.getElementById('prevBtn').disabled = currentPage === 1;
+      document.getElementById('nextBtn').disabled = currentPage === totalPages;
+
+      if (currentViewMode === 'grid') {
+        gridView.classList.remove('hidden');
+        tableView.classList.add('hidden');
+        gridView.innerHTML = paginatedItems.map((item, idx) => {
+          const globalIndex = legoList.indexOf(item);
+          const isOwned = item['보유 여부'] === 'O';
+          return `
+            <div onclick="openDetailModal(${globalIndex})" class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 hover:shadow-md transition cursor-pointer flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs font-bold px-2.5 py-1 rounded-md ${isOwned ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-500'}">
+                    ${isOwned ? '보유중' : '미보유'}
+                  </span>
+                  <span class="text-xs text-slate-400 font-semibold">#${item['레고 품번']}</span>
+                </div>
+                <h4 class="font-bold text-slate-800 line-clamp-1 mb-3">${item['레고명']}</h4>
+              </div>
+
+              <div class="pt-3 border-t border-slate-100 text-xs space-y-1.5 text-slate-500">
+                <div class="flex justify-between"><span>출시가</span> <strong class="text-slate-700">${formatMoney(item['출시가'])}</strong></div>
+                <div class="flex justify-between"><span>매입가</span> <strong class="text-slate-700">${formatMoney(item['매입가'])}</strong></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } else {
+        gridView.classList.add('hidden');
+        tableView.classList.remove('hidden');
+        tableBody.innerHTML = paginatedItems.map((item) => {
+          const globalIndex = legoList.indexOf(item);
+          return `
+            <tr onclick="openDetailModal(${globalIndex})" class="hover:bg-slate-50 cursor-pointer transition">
+              <td class="px-4 py-3 font-semibold text-slate-800">${item['레고 품번']}</td>
+              <td class="px-4 py-3 font-medium text-slate-800">${item['레고명']}</td>
+              <td class="px-4 py-3"><span class="text-xs px-2 py-0.5 rounded font-bold ${item['보유 여부'] === 'O' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}">${item['보유 여부']}</span></td>
+              <td class="px-4 py-3">${item['박스 여부']}</td>
+              <td class="px-4 py-3 text-right">${formatMoney(item['출시가'])}</td>
+              <td class="px-4 py-3 text-right">${formatMoney(item['매입가'])}</td>
+              <td class="px-4 py-3 text-right">${formatMoney(item['되판 가격'])}</td>
+              <td class="px-4 py-3 text-center">
+                <button onclick="event.stopPropagation(); openDetailModal(${globalIndex})" class="text-slate-400 hover:text-slate-600 p-1">
+                  <i class="fa-solid fa-ellipsis-vertical"></i>
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
     }
-  }
 
-  function openAddModal() {
-    document.getElementById('modalTitle').textContent = '레고 봉인 (추가)';
-    document.getElementById('legoNumber').disabled = false;
-    document.getElementById('addModal').classList.add('show');
-  }
-
-  function closeAddModal() {
-    document.getElementById('legoForm').reset();
-    document.getElementById('addModal').classList.remove('show');
-  }
-
-  function openDetailModal(index) {
-    currentDetailIndex = index;
-    const item = legoList[index];
-    if (!item) return;
-
-    const imageUrl = getLegoImageUrl(item);
-    const detailImg = document.getElementById('detailImage');
-    const imgWrapper = detailImg.parentElement;
-    
-    if (imageUrl) {
-      detailImg.src = imageUrl;
-      imgWrapper.style.display = 'flex';
-    } else {
-      imgWrapper.style.display = 'none';
+    function setViewMode(mode) {
+      currentViewMode = mode;
+      document.getElementById('viewGridBtn').className = mode === 'grid' 
+        ? 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-slate-800 shadow-sm transition' 
+        : 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-800 transition';
+      document.getElementById('viewTableBtn').className = mode === 'table' 
+        ? 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-slate-800 shadow-sm transition' 
+        : 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-800 transition';
+      renderList();
     }
 
-    document.getElementById('detailNumber').textContent = '#' + (item['레고 품번'] || '-');
-    document.getElementById('detailName').textContent = item['레고명'] || '이름 없음';
-    
-    const badge = document.getElementById('detailBadge');
-    const ownership = item['보유 여부'] || '미보유';
-    badge.textContent = ownership;
-    badge.className = 'status-badge ' + (ownership === '보유' ? 'owned' : ownership === '판매함' ? 'sold' : 'not-owned');
-
-    document.getElementById('detailReleasePrice').textContent = formatWon(toNumber(item['출시가']));
-    document.getElementById('detailPurchasePrice').textContent = formatWon(toNumber(item['매입가']));
-
-    const soldRow = document.getElementById('detailSoldRow');
-    if (ownership === '판매함') {
-      soldRow.classList.remove('hidden');
-      document.getElementById('detailSoldPrice').textContent = formatWon(toNumber(item['되판 가격']));
-    } else {
-      soldRow.classList.add('hidden');
+    function changePage(direction) {
+      currentPage += direction;
+      renderList();
     }
 
-    document.getElementById('detailBoxStatus').textContent = item['박스 여부'] || '-';
-    document.getElementById('detailMemo').textContent = item['메모'] || '기록된 비밀 메모가 없습니다.';
+    // 상세보기 모달
+    function openDetailModal(index) {
+      currentDetailIndex = index;
+      const item = legoList[index];
 
-    document.getElementById('detailModal').classList.add('show');
-  }
+      const isOwned = item['보유 여부'] === 'O';
+      const badge = document.getElementById('detailBadge');
+      badge.innerText = isOwned ? '보유중' : '미보유';
+      badge.className = `px-2.5 py-1 rounded-md text-xs font-bold ${isOwned ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-500'}`;
 
-  function closeDetailModal() {
-    document.getElementById('detailModal').classList.remove('show');
-    currentDetailIndex = null;
-  }
+      document.getElementById('detailNumber').innerText = `품번: #${item['레고 품번']}`;
+      document.getElementById('detailName').innerText = item['레고명'];
+      document.getElementById('detailRetail').innerText = formatMoney(item['출시가']);
+      document.getElementById('detailPurchase').innerText = formatMoney(item['매입가']);
+      document.getElementById('detailResale').innerText = formatMoney(item['되판 가격']);
+      document.getElementById('detailBox').innerText = item['박스 여부'] === 'O' ? '있음 (O)' : '없음 (X)';
+      document.getElementById('detailMemo').innerText = item['메모'] || '작성된 메모가 없습니다.';
 
-  function editCurrentLego() {
-    if (currentDetailIndex === null) return;
-    const item = legoList[currentDetailIndex];
-    if (!item) return;
+      document.getElementById('detailModal').classList.remove('hidden');
+    }
 
-    document.getElementById('modalTitle').textContent = '레고 정보 수정';
+    function closeDetailModal() {
+      document.getElementById('detailModal').classList.add('hidden');
+    }
 
-    document.getElementById('legoNumber').value = item['레고 품번'] || '';
-    document.getElementById('legoNumber').disabled = true; // 수정 시 품번 수정 불가 (PK 역할)
-    document.getElementById('legoName').value = item['레고명'] || '';
-    document.getElementById('releasePrice').value = item['출시가'] || '';
-    document.getElementById('ownership').value = item['보유 여부'] || '보유';
-    document.getElementById('boxStatus').value = item['박스 여부'] || '박스 있음';
-    document.getElementById('purchasePrice').value = item['매입가'] || '';
-    document.getElementById('soldPrice').value = item['되판 가격'] || '';
-    document.getElementById('memo').value = item['메모'] || '';
+    // 항목 삭제 기능
+    function deleteCurrentItem() {
+      if (currentDetailIndex === null) return;
+      const item = legoList[currentDetailIndex];
 
-    closeDetailModal();
-    document.getElementById('addModal').classList.add('show');
-  }
+      if (!confirm(`'${item['레고명']}' (#${item['레고 품번']}) 항목을 완전 삭제하시겠습니까?`)) {
+        return;
+      }
 
-  async function deleteCurrentLego() {
-    if (currentDetailIndex === null) return;
-    const item = legoList[currentDetailIndex];
-    if (!item) return;
+      showLoading(true);
+      closeDetailModal();
 
-    const confirmDelete = confirm(`'${item['레고명']}' 기록을 정말 서고에서 제거하시겠습니까?`);
-    if (!confirmDelete) return;
-
-    try {
-      showLoading();
-
-      const response = await fetch(API_URL, {
+      fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({
           action: 'delete',
           '레고 품번': item['레고 품번']
         })
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res.success) {
+          alert('성공적으로 삭제되었습니다.');
+          fetchData(); // 삭제 후 최신 시트 데이터 재조회
+        } else {
+          alert('삭제 실패: ' + (res.error || '알 수 없는 오류'));
+          showLoading(false);
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert('삭제 요청 중 오류가 발생했습니다.');
+        showLoading(false);
       });
+    }
 
-      const result = await response.json();
+    // 등록 / 수정 모달
+    function openFormModal(editIndex = null) {
+      const isEdit = editIndex !== null;
+      document.getElementById('formTitle').innerText = isEdit ? '레고 정보 수정' : '새 레고 추가';
+      
+      const numInput = document.getElementById('inputNumber');
+      if (isEdit) {
+        const item = legoList[editIndex];
+        numInput.value = item['레고 품번'];
+        numInput.readOnly = true; // 수정 시 품번 변경 불가
+        numInput.classList.add('bg-slate-200');
 
-      if (!result.success) {
-        throw new Error(result.error || '삭제 처리에 실패했습니다.');
+        document.getElementById('inputName').value = item['레고명'] || '';
+        document.getElementById('inputOwned').value = item['보유 여부'] || 'O';
+        document.getElementById('inputBox').value = item['박스 여부'] || 'O';
+        document.getElementById('inputRetail').value = item['출시가'] || '';
+        document.getElementById('inputPurchase').value = item['매입가'] || '';
+        document.getElementById('inputResale').value = item['되판 가격'] || '';
+        document.getElementById('inputMemo').value = item['메모'] || '';
+      } else {
+        document.getElementById('legoForm').reset();
+        numInput.readOnly = false;
+        numInput.classList.remove('bg-slate-200');
       }
 
-      alert('마법 서고에서 깔끔하게 소멸되었습니다! 🪄');
+      document.getElementById('formModal').classList.remove('hidden');
+    }
+
+    function editCurrentItem() {
+      const index = currentDetailIndex;
       closeDetailModal();
-      await loadLegoData();
-
-    } catch (error) {
-      console.error(error);
-      alert('소멸 주문 실패: ' + error.message);
-      await loadLegoData();
+      openFormModal(index);
     }
-  }
 
-  function closeModalBackground(event, modalId) {
-    if (event.target.id === modalId) {
-      if (modalId === 'addModal') closeAddModal();
-      if (modalId === 'detailModal') closeDetailModal();
+    function closeFormModal() {
+      document.getElementById('formModal').classList.add('hidden');
     }
-  }
 
-  function toNumber(value) {
-    if (value === null || value === undefined || value === '') return 0;
-    return Number(String(value).replace(/,/g, '').replace(/원/g, '')) || 0;
-  }
+    function handleFormSubmit(e) {
+      e.preventDefault();
 
-  function formatWon(value) {
-    return Math.round(value).toLocaleString('ko-KR') + '원';
-  }
+      const payload = {
+        '레고 품번': document.getElementById('inputNumber').value,
+        '레고명': document.getElementById('inputName').value,
+        '보유 여부': document.getElementById('inputOwned').value,
+        '박스 여부': document.getElementById('inputBox').value,
+        '출시가': Number(document.getElementById('inputRetail').value) || 0,
+        '매입가': Number(document.getElementById('inputPurchase').value) || 0,
+        '되판 가격': Number(document.getElementById('inputResale').value) || 0,
+        '메모': document.getElementById('inputMemo').value
+      };
 
-  function escapeHtml(value) {
-    return String(value)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-  }
+      closeFormModal();
+      showLoading(true);
 
-  function showLoading() {
-    document.getElementById('legoGrid').innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon loading">✨</div>
-        <h3>마법 서고에서 기록을 불러오는 중...</h3>
-        <p>잠시만 기다려주세요.</p>
-      </div>
-    `;
-    document.getElementById('paginationControls').innerHTML = '';
-  }
+      fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res.success) {
+          alert('성공적으로 저장되었습니다.');
+          fetchData();
+        } else {
+          alert('저장 실패: ' + (res.error || '알 수 없는 오류'));
+          showLoading(false);
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert('저장 도중 오류가 발생했습니다.');
+        showLoading(false);
+      });
+    }
 
-  function showError(message) {
-    document.getElementById('legoGrid').innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">⚡</div>
-        <h3>기록을 불러오지 못했습니다.</h3>
-        <p>${message}</p>
-        <button type="button" class="primary-button retry-button" onclick="loadLegoData()">
-          다시 불러오기
-        </button>
-      </div>
-    `;
-    document.getElementById('paginationControls').innerHTML = '';
-  }
-</script>
-
+    function formatMoney(amount) {
+      if (!amount && amount !== 0) return '0원';
+      return Number(amount).toLocaleString('ko-KR') + '원';
+    }
+  </script>
 </body>
 </html>
