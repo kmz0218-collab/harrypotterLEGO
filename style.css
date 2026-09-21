@@ -7,7 +7,6 @@
   --text-dark: #1e293b;
   --text-muted: #64748b;
 
-  /* 다채로운 컬러스펙트럼 포인트 */
   --color-red: #ef4444;
   --color-red-bg: #fee2e2;
 
@@ -147,7 +146,7 @@ h1 {
 }
 
 /* =====================
-   SUMMARY CARDS (알록달록 다채로운 색상)
+   SUMMARY CARDS
 ===================== */
 
 .summary {
@@ -170,15 +169,6 @@ h1 {
 
 .summary-card:hover {
   transform: translateY(-2px);
-}
-
-.summary-card::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 5px;
-  height: 100%;
 }
 
 .summary-card.card-red { border-top: 3px solid var(--color-red); }
@@ -300,7 +290,6 @@ h1 {
   color: var(--color-pink);
 }
 
-/* 1) 카드형 레이아웃 (Grid Mode) */
 .lego-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -407,7 +396,7 @@ h1 {
   color: var(--text-muted);
 }
 
-/* 2) 목록형 레이아웃 (List View Mode - 한 줄 compact 스타일) */
+/* 목록형 한 줄 모드 */
 .lego-grid.list-view-mode {
   display: flex;
   flex-direction: column;
@@ -474,10 +463,46 @@ h1 {
   padding: 3px 8px;
 }
 
-
 /* =====================
-   EMPTY / LOADING STATES
+   PAGINATION (페이지네이션)
 ===================== */
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 32px;
+}
+
+.page-btn {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--border-color);
+  background: #ffffff;
+  color: var(--text-dark);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.page-btn:hover:not(:disabled) {
+  border-color: var(--color-purple);
+  color: var(--color-purple);
+}
+
+.page-btn.active {
+  background: var(--color-purple);
+  color: #ffffff;
+  border-color: var(--color-purple);
+}
+
+.page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
 
 .empty-state {
   grid-column: 1 / -1;
@@ -633,7 +658,6 @@ form input:focus, form select:focus, form textarea:focus {
   background: #fca5a5;
 }
 
-/* DETAIL MODAL */
 .detail-image-wrapper {
   width: 100%;
   height: 180px;
@@ -714,7 +738,6 @@ form input:focus, form select:focus, form textarea:focus {
   display: none !important;
 }
 
-/* Responsive */
 @media (max-width: 850px) {
   .summary { grid-template-columns: repeat(2, 1fr); }
   .lego-grid { grid-template-columns: repeat(2, 1fr); }
