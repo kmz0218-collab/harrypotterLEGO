@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&family=Cinzel:wght@600;700;800&display=swap');
 
 :root {
   --bg-white: #ffffff;
@@ -19,8 +19,10 @@
   --color-blue: #3b82f6;
   --color-blue-bg: #dbeafe;
 
-  --color-purple: #8b5cf6;
-  --color-purple-bg: #ede9fe;
+  /* 호그와트 메인 포인트 컬러 (다크 레드 + 골드) */
+  --color-purple: #7f1d1d;
+  --hp-gold: #c9962c;
+  --hp-accent-rgb: 127, 29, 29;
 
   --color-pink: #ec4899;
 
@@ -73,17 +75,36 @@ button {
 }
 
 .logo {
+  font-family: 'Cinzel', 'Noto Sans KR', sans-serif;
   font-size: 18px;
   font-weight: 800;
   color: var(--text-dark);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
   display: flex;
   align-items: center;
   gap: 8px;
+  text-decoration: none;
 }
 
 .logo-icon {
   font-size: 22px;
+}
+
+.nav {
+  display: flex;
+  gap: 20px;
+}
+
+.nav a {
+  color: var(--text-muted);
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.nav a.active,
+.nav a:hover {
+  color: var(--color-purple);
 }
 
 /* =====================
@@ -114,8 +135,9 @@ button {
 
 h1 {
   margin: 0 0 6px;
+  font-family: 'Cinzel', 'Noto Sans KR', sans-serif;
   font-size: 30px;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.01em;
   color: var(--text-dark);
 }
 
@@ -125,24 +147,37 @@ h1 {
   font-size: 14px;
 }
 
+.back-link {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.back-link:hover {
+  color: var(--color-purple);
+}
+
 .primary-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 10px 20px;
-  background: linear-gradient(135deg, var(--color-purple), var(--color-blue));
+  background: linear-gradient(135deg, var(--color-purple), var(--hp-gold));
   color: #ffffff;
   border: none;
   border-radius: 10px;
   font-size: 13.5px;
   font-weight: 700;
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+  box-shadow: 0 4px 12px rgba(var(--hp-accent-rgb), 0.25);
   transition: all 0.2s ease;
 }
 
 .primary-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.35);
+  box-shadow: 0 6px 16px rgba(var(--hp-accent-rgb), 0.35);
 }
 
 /* =====================
@@ -310,7 +345,7 @@ h1 {
 .lego-card:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-md);
-  border-color: var(--color-blue);
+  border-color: var(--color-purple);
 }
 
 .lego-image {
@@ -617,7 +652,7 @@ form input, form select, form textarea {
 
 form input:focus, form select:focus, form textarea:focus {
   border-color: var(--color-purple);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+  box-shadow: 0 0 0 3px rgba(var(--hp-accent-rgb), 0.15);
 }
 
 .modal-actions {

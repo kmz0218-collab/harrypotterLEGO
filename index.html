@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>레고 컬렉션 - LEGO Collection</title>
+  <title>호그와트 아카이브 - 해리포터 레고 컬렉션</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <header class="header">
     <div class="header-inner">
-      <a href="index.html" class="logo">🧱 LEGO COLLECTION</a>
+      <a href="index.html" class="logo">🪄 HOGWARTS ARCHIVE</a>
     </div>
   </header>
 
@@ -18,29 +18,29 @@
 
     <div class="page-title">
       <div>
-        <p class="eyebrow">MY COLLECTION</p>
-        <h1>레고 컬렉션 관리</h1>
-        <p class="description">내가 가진 레고를 한눈에 기록하고 관리해보세요.</p>
+        <p class="eyebrow">MY MAGICAL COLLECTION</p>
+        <h1>나의 해리포터 레고 컬렉션</h1>
+        <p class="description">마법 세계 속 나만의 작은 호그와트를 기록하고 관리해보세요. ⚡</p>
       </div>
-      <button class="primary-button" onclick="openFormModal()">+ 레고 추가</button>
+      <button class="primary-button" onclick="openFormModal()">🪄 새 세트 소환하기</button>
     </div>
 
-    <!-- 요약 카드 -->
+    <!-- 요약 카드 (4개 기숙사 색깔) -->
     <div class="summary">
       <div class="summary-card card-red">
-        <span class="summary-label">전체 레고</span>
+        <span class="summary-label">🦁 전체 소장품</span>
         <strong id="statTotal">0개</strong>
       </div>
       <div class="summary-card card-green">
-        <span class="summary-label">보유 중</span>
+        <span class="summary-label">🐍 보유 중인 세트</span>
         <strong id="statOwned">0개</strong>
       </div>
       <div class="summary-card card-blue">
-        <span class="summary-label">총 매입가</span>
+        <span class="summary-label">🦅 총 매입 금액</span>
         <strong id="statPurchase">0원</strong>
       </div>
       <div class="summary-card card-purple">
-        <span class="summary-label">총 출시가</span>
+        <span class="summary-label">🦡 총 정가 합계</span>
         <strong id="statRetail">0원</strong>
       </div>
     </div>
@@ -49,17 +49,17 @@
     <div class="toolbar">
       <div class="search-box">
         <span>🔍</span>
-        <input type="text" id="searchInput" placeholder="품번 또는 레고명 검색..." oninput="handleSearch()">
+        <input type="text" id="searchInput" placeholder="세트 번호나 이름으로 마법을 걸어보세요..." oninput="handleSearch()">
       </div>
       <select id="ownedFilter" onchange="handleFilterChange()">
-        <option value="ALL">보유 여부: 전체</option>
-        <option value="O">보유 중</option>
-        <option value="X">미보유</option>
+        <option value="ALL">소장 여부: 전체</option>
+        <option value="O">소장 중</option>
+        <option value="X">미소장</option>
       </select>
       <select id="boxFilter" onchange="handleFilterChange()">
-        <option value="ALL">박스 여부: 전체</option>
-        <option value="O">박스 있음</option>
-        <option value="X">박스 없음</option>
+        <option value="ALL">상자 상태: 전체</option>
+        <option value="O">상자 있음</option>
+        <option value="X">상자 없음</option>
       </select>
       <div class="view-toggle-group">
         <button id="viewGridBtn" class="toggle-button active" onclick="setViewMode('grid')">▦ 카드</button>
@@ -68,14 +68,14 @@
     </div>
 
     <div class="view-title">
-      <h2>레고 목록 <span id="resultCount">(0)</span></h2>
+      <h2>나의 컬렉션 <span id="resultCount">(0)</span></h2>
     </div>
 
     <div id="legoGrid" class="lego-grid"></div>
 
     <div id="emptyState" class="empty-state hidden">
-      <div class="empty-icon">📦</div>
-      <p>조건에 맞는 레고가 없습니다.</p>
+      <div class="empty-icon">🪶</div>
+      <p>조건에 맞는 마법 물품을 찾지 못했어요.</p>
     </div>
 
     <div id="pagination" class="pagination hidden"></div>
@@ -83,20 +83,21 @@
   </main>
 
   <footer class="footer">
-    <p>LEGO Collection</p>
-    <span>나만의 레고 컬렉션을 기록해보세요.</span>
+    <p>Harry Potter LEGO Collection</p>
+    <span>나만의 작은 호그와트를 기록해보세요. ⚡🪄</span>
   </footer>
 
   <!-- 상세정보 팝업(모달) -->
   <div id="detailModal" class="modal">
     <div class="modal-box">
       <div class="modal-header">
-        <h2>레고 상세 정보</h2>
+        <h2>세트 상세 정보</h2>
         <button class="modal-close" onclick="closeDetailModal()">✕</button>
       </div>
 
       <div class="detail-image-wrapper">
-        <div class="image-placeholder" style="font-size:56px;">🧱</div>
+        <img id="detailImage" src="" alt="세트 이미지" style="display:none;">
+        <div id="detailImagePlaceholder" class="image-placeholder" style="font-size:56px;">🧱</div>
       </div>
 
       <div class="detail-header-info">
@@ -105,13 +106,13 @@
         <span id="detailBadge" class="status-badge"></span>
       </div>
 
-      <div class="detail-row"><span>출시가</span><strong id="detailRetail"></strong></div>
+      <div class="detail-row"><span>정가</span><strong id="detailRetail"></strong></div>
       <div class="detail-row"><span>매입가</span><strong id="detailPurchase"></strong></div>
-      <div class="detail-row"><span>박스 여부</span><strong id="detailBoxYn"></strong></div>
+      <div class="detail-row"><span>상자 여부</span><strong id="detailBoxYn"></strong></div>
       <div class="detail-row"><span>되판 가격</span><strong id="detailResale"></strong></div>
 
       <div class="detail-memo-box">
-        <p class="memo-title">메모</p>
+        <p class="memo-title">✒️ 마법 일지</p>
         <p id="detailMemo" class="memo-text"></p>
       </div>
 
@@ -127,29 +128,35 @@
   <div id="formModal" class="modal">
     <div class="modal-box">
       <div class="modal-header">
-        <h2 id="formTitle">레고 추가</h2>
+        <h2 id="formTitle">새 세트 소환하기</h2>
         <button class="modal-close" onclick="closeFormModal()">✕</button>
       </div>
+
+      <div class="detail-image-wrapper" style="margin-bottom:14px;">
+        <img id="formPreviewImage" src="" alt="세트 미리보기" style="display:none;">
+        <div id="formPreviewPlaceholder" class="image-placeholder" style="font-size:44px;">🧱</div>
+      </div>
+
       <form id="legoForm" onsubmit="handleFormSubmit(event)">
-        <label>레고 품번 *
-          <input type="text" id="inputNumber" required>
+        <label>세트 번호 *
+          <input type="text" id="inputNumber" required oninput="updateFormPreview()">
         </label>
-        <label>레고명 *
+        <label>세트 이름 *
           <input type="text" id="inputName" required>
         </label>
-        <label>보유 여부
+        <label>소장 여부
           <select id="inputOwned">
-            <option value="O">보유</option>
-            <option value="X">미보유</option>
+            <option value="O">소장 중</option>
+            <option value="X">미소장</option>
           </select>
         </label>
-        <label>박스 여부
+        <label>상자 여부
           <select id="inputBox">
             <option value="O">있음</option>
             <option value="X">없음</option>
           </select>
         </label>
-        <label>출시가 (원)
+        <label>정가 (원)
           <input type="number" id="inputRetail" placeholder="0">
         </label>
         <label>매입가 (원)
@@ -158,7 +165,7 @@
         <label>되판 가격 (원)
           <input type="number" id="inputResale" placeholder="0">
         </label>
-        <label>메모
+        <label>마법 일지 (메모)
           <textarea id="inputMemo" rows="3"></textarea>
         </label>
         <div class="modal-actions">
@@ -173,18 +180,26 @@
     // 구글 시트와 연결된 API 주소 (원래 쓰던 것 그대로)
     const API_URL = 'https://script.google.com/macros/s/AKfycbxUnBlqaFdTPU35exUbNzXx6weWhpHpGSwAO96-5ot2qbNLupyuga-As1OnJ45oyeBlAw/exec';
 
-    let legoList = [];         // 구글 시트에서 받아온 전체 레고 목록
+    let legoList = [];         // 구글 시트에서 받아온 전체 세트 목록
     let filteredList = [];     // 검색/필터가 적용된 목록
     let currentView = 'grid';  // 현재 보기 방식 (grid: 카드형 / list: 목록형)
     let currentPage = 1;
-    let currentDetailNo = null; // 지금 상세팝업에 열려있는 레고의 품번
+    let currentDetailNo = null; // 지금 상세팝업에 열려있는 세트의 번호
     const ITEMS_PER_PAGE = 12;
 
     document.addEventListener('DOMContentLoaded', fetchData);
 
+    // ===== 세트 번호로 사진 주소 만들기 =====
+    // 브릭링크(BrickLink)라는 사이트가 세트 번호별 사진을 무료로 제공해줘서, 그 주소 규칙을 그대로 이용해요.
+    // 사진이 없는 세트라면 onerror가 실행돼서 자동으로 🧱 아이콘으로 바뀌어요.
+    function getImageUrl(no) {
+      const cleanNo = String(no).trim().split('-')[0]; // 혹시 "76391-1"처럼 적혀있어도 앞부분만 사용
+      return `https://img.bricklink.com/ItemImage/SN/0/${cleanNo}-1.png`;
+    }
+
     // ===== 데이터 불러오기 =====
     function fetchData() {
-      document.getElementById('legoGrid').innerHTML = '<p class="loading">불러오는 중...</p>';
+      document.getElementById('legoGrid').innerHTML = '<p class="loading">마법 지팡이를 휘두르는 중...</p>';
       fetch(API_URL)
         .then(res => res.json())
         .then(response => {
@@ -273,14 +288,18 @@
     function cardHTML(item) {
       const isOwned = item['보유 여부'] === 'O';
       const no = item['레고 품번'];
+      const imgUrl = getImageUrl(no);
       return `
         <div class="lego-card" onclick="openDetailModal('${no}')">
-          <span class="status-badge ${isOwned ? 'owned' : 'not-owned'}">${isOwned ? '보유중' : '미보유'}</span>
-          <div class="lego-image"><div class="image-placeholder">🧱</div></div>
+          <span class="status-badge ${isOwned ? 'owned' : 'not-owned'}">${isOwned ? '소장 중' : '미소장'}</span>
+          <div class="lego-image">
+            <img src="${imgUrl}" alt="${item['레고명']}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="image-placeholder" style="display:none;">🧱</div>
+          </div>
           <div class="lego-info">
             <p class="lego-number">#${no}</p>
             <h3>${item['레고명']}</h3>
-            <div class="info-row"><span>출시가</span><strong>${formatMoney(item['출시가'])}</strong></div>
+            <div class="info-row"><span>정가</span><strong>${formatMoney(item['출시가'])}</strong></div>
             <div class="info-row"><span>매입가</span><strong>${formatMoney(item['매입가'])}</strong></div>
           </div>
         </div>`;
@@ -324,8 +343,16 @@
       document.getElementById('detailName').innerText = item['레고명'];
 
       const badge = document.getElementById('detailBadge');
-      badge.innerText = isOwned ? '보유중' : '미보유';
+      badge.innerText = isOwned ? '소장 중' : '미소장';
       badge.className = `status-badge ${isOwned ? 'owned' : 'not-owned'}`;
+
+      // 상세팝업 사진도 자동으로 불러오기
+      const img = document.getElementById('detailImage');
+      const placeholder = document.getElementById('detailImagePlaceholder');
+      img.src = getImageUrl(no);
+      img.style.display = 'block';
+      placeholder.style.display = 'none';
+      img.onerror = () => { img.style.display = 'none'; placeholder.style.display = 'flex'; };
 
       document.getElementById('detailRetail').innerText = formatMoney(item['출시가']);
       document.getElementById('detailPurchase').innerText = formatMoney(item['매입가']);
@@ -349,7 +376,7 @@
     function deleteCurrentItem() {
       const item = legoList.find(i => String(i['레고 품번']) === String(currentDetailNo));
       if (!item) return;
-      if (!confirm(`'${item['레고명']}' (#${item['레고 품번']}) 항목을 완전 삭제하시겠습니까?`)) return;
+      if (!confirm(`'${item['레고명']}' (#${item['레고 품번']}) 항목을 정말 삭제하시겠습니까? 이 마법은 되돌릴 수 없어요.`)) return;
 
       closeDetailModal();
 
@@ -361,7 +388,7 @@
       .then(res => res.json())
       .then(res => {
         if (res.success) {
-          alert('성공적으로 삭제되었습니다.');
+          alert('세트가 컬렉션에서 사라졌습니다. ✨');
           fetchData();
         } else {
           alert('삭제 실패: ' + (res.error || '알 수 없는 오류'));
@@ -375,12 +402,12 @@
 
     // ===== 추가 / 수정 팝업(모달) =====
     function openFormModal(item = null) {
-      document.getElementById('formTitle').innerText = item ? '레고 정보 수정' : '새 레고 추가';
+      document.getElementById('formTitle').innerText = item ? '세트 정보 수정' : '새 세트 소환하기';
       const numInput = document.getElementById('inputNumber');
 
       if (item) {
         numInput.value = item['레고 품번'];
-        numInput.readOnly = true; // 수정할 때는 품번을 바꿀 수 없게 막기
+        numInput.readOnly = true; // 수정할 때는 세트 번호를 바꿀 수 없게 막기
         document.getElementById('inputName').value = item['레고명'] || '';
         document.getElementById('inputOwned').value = item['보유 여부'] || 'O';
         document.getElementById('inputBox').value = item['박스 여부'] || 'O';
@@ -393,11 +420,30 @@
         numInput.readOnly = false;
       }
 
+      updateFormPreview();
       document.getElementById('formModal').classList.add('show');
     }
 
     function closeFormModal() {
       document.getElementById('formModal').classList.remove('show');
+    }
+
+    // 입력 폼에서 세트 번호를 입력할 때마다 미리보기 사진 갱신
+    function updateFormPreview() {
+      const no = document.getElementById('inputNumber').value.trim();
+      const img = document.getElementById('formPreviewImage');
+      const placeholder = document.getElementById('formPreviewPlaceholder');
+
+      if (!no) {
+        img.style.display = 'none';
+        placeholder.style.display = 'flex';
+        return;
+      }
+
+      img.src = getImageUrl(no);
+      img.style.display = 'block';
+      placeholder.style.display = 'none';
+      img.onerror = () => { img.style.display = 'none'; placeholder.style.display = 'flex'; };
     }
 
     function handleFormSubmit(e) {
@@ -424,7 +470,7 @@
       .then(res => res.json())
       .then(res => {
         if (res.success) {
-          alert('성공적으로 저장되었습니다.');
+          alert('마법처럼 저장되었습니다! ✨');
           fetchData();
         } else {
           alert('저장 실패: ' + (res.error || '알 수 없는 오류'));
