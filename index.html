@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>호그와트 아카이브 - 해리포터 레고 컬렉션</title>
+  <title>해리포터 레고 컬렉션</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <header class="header">
     <div class="header-inner">
-      <a href="index.html" class="logo">🪄 HOGWARTS ARCHIVE</a>
+      <a href="index.html" class="logo">🪄 해리포터 레고 컬렉션</a>
     </div>
   </header>
 
@@ -18,9 +18,9 @@
 
     <div class="page-title">
       <div>
-        <p class="eyebrow">MY MAGICAL COLLECTION</p>
+        <p class="eyebrow">🖤 내 인생을 망치러 온 나의 구원자</p>
         <h1>나의 해리포터 레고 컬렉션</h1>
-        <p class="description">마법 세계 속 나만의 작은 호그와트를 기록하고 관리해보세요. ⚡</p>
+        <p class="description">모든 해리포터 레고 시리즈를 모을 때까지...(파산핑) 💸</p>
       </div>
       <button class="primary-button" onclick="openFormModal()">🪄 새 세트 소환하기</button>
     </div>
@@ -49,7 +49,7 @@
     <div class="toolbar">
       <div class="search-box">
         <span>🔍</span>
-        <input type="text" id="searchInput" placeholder="세트 번호나 이름으로 마법을 걸어보세요..." oninput="handleSearch()">
+        <input type="text" id="searchInput" placeholder="아씨오! 🪄 (세트 번호나 이름으로 소환하기)" oninput="handleSearch()">
       </div>
       <select id="ownedFilter" onchange="handleFilterChange()">
         <option value="ALL">소장 여부: 전체</option>
@@ -255,6 +255,13 @@
         const matchBox = box === 'ALL' || String(item['박스 여부'] || '').toUpperCase() === box;
 
         return matchKeyword && matchOwned && matchBox;
+      });
+
+      // 기본적으로 세트 번호(품번) 오름차순으로 정렬 (숫자로 비교해서 76391 같은 번호도 자연스럽게 정렬됨)
+      filteredList.sort((a, b) => {
+        const noA = String(a['레고 품번'] || '');
+        const noB = String(b['레고 품번'] || '');
+        return noA.localeCompare(noB, undefined, { numeric: true });
       });
 
       renderList();
