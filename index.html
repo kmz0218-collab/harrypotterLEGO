@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>동글이의 은밀한 사생활</title>
+  <title>해리포터 레고 컬렉션</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <header class="header">
     <div class="header-inner">
-      <a href="index.html" class="logo">🪄 Harry Potter Lego Collection</a>
+      <a href="index.html" class="logo">🪄 해리포터 레고 컬렉션</a>
     </div>
   </header>
 
@@ -19,7 +19,7 @@
     <div class="page-title">
       <div>
         <p class="eyebrow">🖤 내 인생을 망치러 온 나의 구원자</p>
-        <h1>나의 레고 장식장</h1>
+        <h1>나의 해리포터 레고 컬렉션</h1>
         <p class="description">모든 해리포터 레고 시리즈를 모을 때까지...(파산핑) 💸</p>
       </div>
       <button class="primary-button" onclick="openFormModal()">🪄 새 세트 소환하기</button>
@@ -96,6 +96,7 @@
       </div>
 
       <div class="detail-image-wrapper">
+        <span id="detailBadge" class="status-badge"></span>
         <img id="detailImage" src="" alt="세트 이미지" style="display:none;">
         <div id="detailImagePlaceholder" class="image-placeholder" style="font-size:56px;">🧱</div>
       </div>
@@ -103,7 +104,6 @@
       <div class="detail-header-info">
         <p id="detailNumber" class="lego-number-tag"></p>
         <h3 id="detailName"></h3>
-        <span id="detailBadge" class="status-badge"></span>
       </div>
 
       <div class="detail-row"><span>정가</span><strong id="detailRetail"></strong></div>
@@ -150,20 +150,20 @@
             <option value="X">미소장</option>
           </select>
         </label>
-        <label>상자 여부
+        <label>정가 (원)
+          <input type="text" inputmode="numeric" id="inputRetail" placeholder="0" oninput="formatNumberInput(this)">
+        </label>
+        <label>매입가 (원)
+          <input type="text" inputmode="numeric" id="inputPurchase" placeholder="0" oninput="formatNumberInput(this); updateBoxAvailability();">
+        </label>
+        <label>상자 여부 <span style="font-weight:400;color:var(--text-muted);">(매입가를 입력하면 선택할 수 있어요)</span>
           <select id="inputBox">
             <option value="O">있음</option>
             <option value="X">없음</option>
           </select>
         </label>
-        <label>정가 (원)
-          <input type="number" id="inputRetail" placeholder="0">
-        </label>
-        <label>매입가 (원)
-          <input type="number" id="inputPurchase" placeholder="0">
-        </label>
         <label>되판 가격 (원)
-          <input type="number" id="inputResale" placeholder="0">
+          <input type="text" inputmode="numeric" id="inputResale" placeholder="0" oninput="formatNumberInput(this)">
         </label>
         <label>마법 일지 (메모)
           <textarea id="inputMemo" rows="3"></textarea>
@@ -298,7 +298,6 @@
       const imgUrl = getImageUrl(no);
       return `
         <div class="lego-card" onclick="openDetailModal('${no}')">
-          <span class="status-badge ${isOwned ? 'owned' : 'not-owned'}">${isOwned ? '소장 중' : '미소장'}</span>
           <div class="lego-image">
             <img src="${imgUrl}" alt="${item['레고명']}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
             <div class="image-placeholder" style="display:none;">🧱</div>
@@ -309,6 +308,7 @@
             <div class="info-row"><span>정가</span><strong>${formatMoney(item['출시가'])}</strong></div>
             <div class="info-row"><span>매입가</span><strong>${formatMoney(item['매입가'])}</strong></div>
           </div>
+          <span class="status-badge ${isOwned ? 'owned' : 'not-owned'}">${isOwned ? '소장 중' : '미소장'}</span>
         </div>`;
     }
 
@@ -418,9 +418,9 @@
         document.getElementById('inputName').value = item['레고명'] || '';
         document.getElementById('inputOwned').value = item['보유 여부'] || 'O';
         document.getElementById('inputBox').value = item['박스 여부'] || 'O';
-        document.getElementById('inputRetail').value = item['출시가'] || '';
-        document.getElementById('inputPurchase').value = item['매입가'] || '';
-        document.getElementById('inputResale').value = item['되판 가격'] || '';
+        document.getElementById('inputRetail').value = item['출시가'] ? Number(item['출시가']).toLocaleString('ko-KR') : '';
+        document.getElementById('inputPurchase').value = item['매입가'] ? Number(item['매입가']).toLocaleString('ko-KR') : '';
+        document.getElementById('inputResale').value = item['되판 가격'] ? Number(item['되판 가격']).toLocaleString('ko-KR') : '';
         document.getElementById('inputMemo').value = item['메모'] || '';
       } else {
         document.getElementById('legoForm').reset();
@@ -428,11 +428,36 @@
       }
 
       updateFormPreview();
+      updateBoxAvailability();
       document.getElementById('formModal').classList.add('show');
     }
 
     function closeFormModal() {
       document.getElementById('formModal').classList.remove('show');
+    }
+
+    // 가격 입력칸에 천단위 콤마(,)를 자동으로 넣어주는 함수
+    // 예: "400000" 입력 -> 화면에는 "400,000"으로 보여줌
+    function formatNumberInput(el) {
+      const raw = el.value.replace(/[^0-9]/g, ''); // 숫자만 남기기
+      el.value = raw === '' ? '' : Number(raw).toLocaleString('ko-KR');
+    }
+
+    // 콤마가 찍힌 입력값을 다시 순수 숫자로 되돌리는 함수 (저장할 때 사용)
+    function getRawNumber(inputId) {
+      const raw = document.getElementById(inputId).value.replace(/[^0-9]/g, '');
+      return raw === '' ? 0 : Number(raw);
+    }
+
+    // 매입가를 입력했을 때만 "상자 여부"를 선택할 수 있도록 켜고 끄는 함수
+    function updateBoxAvailability() {
+      const purchase = getRawNumber('inputPurchase');
+      const boxSelect = document.getElementById('inputBox');
+      const canSelect = purchase > 0;
+      boxSelect.disabled = !canSelect;
+      if (!canSelect) {
+        boxSelect.value = 'X'; // 매입가가 없으면 자동으로 "없음"으로 되돌리기
+      }
     }
 
     // 입력 폼에서 세트 번호를 입력할 때마다 미리보기 사진 갱신
@@ -461,9 +486,9 @@
         '레고명': document.getElementById('inputName').value,
         '보유 여부': document.getElementById('inputOwned').value,
         '박스 여부': document.getElementById('inputBox').value,
-        '출시가': Number(document.getElementById('inputRetail').value) || 0,
-        '매입가': Number(document.getElementById('inputPurchase').value) || 0,
-        '되판 가격': Number(document.getElementById('inputResale').value) || 0,
+        '출시가': getRawNumber('inputRetail'),
+        '매입가': getRawNumber('inputPurchase'),
+        '되판 가격': getRawNumber('inputResale'),
         '메모': document.getElementById('inputMemo').value
       };
 
