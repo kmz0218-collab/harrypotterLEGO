@@ -303,10 +303,14 @@
             <div class="image-placeholder" style="display:none;">🧱</div>
           </div>
           <div class="lego-info">
-            <p class="lego-number">#${no}</p>
-            <h3>${item['레고명']}</h3>
-            <div class="info-row"><span>정가</span><strong>${formatMoney(item['출시가'])}</strong></div>
-            <div class="info-row"><span>매입가</span><strong>${formatMoney(item['매입가'])}</strong></div>
+            <div class="info-title-row">
+              <span class="lego-number">#${no}</span>
+              <h3>${item['레고명']}</h3>
+            </div>
+            <div class="info-price-row">
+              <span class="info-row"><span>정가</span><strong>${formatMoney(item['출시가'])}</strong></span>
+              <span class="info-row"><span>매입가</span><strong>${formatMoney(item['매입가'])}</strong></span>
+            </div>
           </div>
           <span class="status-badge ${isOwned ? 'owned' : 'not-owned'}">${isOwned ? '소장 중' : '미소장'}</span>
         </div>`;
