@@ -803,7 +803,7 @@ form select:disabled {
   .lego-grid.list-view-mode .lego-info {
     flex: 1 1 auto;
     flex-wrap: wrap;
-    padding: 0 0 0 10px;
+    padding: 0 40px 0 10px;
     gap: 2px 8px;
     min-width: 0;
   }
@@ -824,8 +824,10 @@ form select:disabled {
     gap: 3px;
   }
   .lego-grid.list-view-mode .status-badge {
-    position: static;
-    margin-left: auto;
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    margin-left: 0;
     font-size: 9.5px;
     padding: 2px 6px;
   }
