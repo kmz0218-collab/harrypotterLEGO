@@ -61,6 +61,17 @@
         <option value="O">상자 있음</option>
         <option value="X">상자 없음</option>
       </select>
+      <select id="seriesFilter" onchange="handleFilterChange()">
+        <option value="ALL">시리즈: 전체</option>
+        <option value="미분류">미분류</option>
+        <option value="1. 마법사의 돌">1. 마법사의 돌</option>
+        <option value="2. 비밀의 방">2. 비밀의 방</option>
+        <option value="3. 아즈카반의 죄수">3. 아즈카반의 죄수</option>
+        <option value="4. 불의 잔">4. 불의 잔</option>
+        <option value="5. 불사조 기사단">5. 불사조 기사단</option>
+        <option value="6. 혼혈왕자">6. 혼혈왕자</option>
+        <option value="7. 죽음의 성물">7. 죽음의 성물</option>
+      </select>
       <div class="view-toggle-group">
         <button id="viewGridBtn" class="toggle-button active" onclick="setViewMode('grid')">▦ 카드</button>
         <button id="viewListBtn" class="toggle-button" onclick="setViewMode('list')">☰ 목록</button>
@@ -106,6 +117,7 @@
         <h3 id="detailName"></h3>
       </div>
 
+      <div class="detail-row"><span>시리즈</span><strong id="detailSeries"></strong></div>
       <div class="detail-row"><span>정가</span><strong id="detailRetail"></strong></div>
       <div class="detail-row"><span>매입가</span><strong id="detailPurchase"></strong></div>
       <div class="detail-row"><span>상자 여부</span><strong id="detailBoxYn"></strong></div>
@@ -143,6 +155,18 @@
         </label>
         <label>세트 이름 *
           <input type="text" id="inputName" required>
+        </label>
+        <label>해리포터 시리즈
+          <select id="inputSeries">
+            <option value="미분류">미분류</option>
+            <option value="1. 마법사의 돌">1. 마법사의 돌</option>
+            <option value="2. 비밀의 방">2. 비밀의 방</option>
+            <option value="3. 아즈카반의 죄수">3. 아즈카반의 죄수</option>
+            <option value="4. 불의 잔">4. 불의 잔</option>
+            <option value="5. 불사조 기사단">5. 불사조 기사단</option>
+            <option value="6. 혼혈왕자">6. 혼혈왕자</option>
+            <option value="7. 죽음의 성물">7. 죽음의 성물</option>
+          </select>
         </label>
         <label>소장 여부
           <select id="inputOwned">
@@ -245,6 +269,7 @@
       const keyword = document.getElementById('searchInput').value.toLowerCase();
       const owned = document.getElementById('ownedFilter').value;
       const box = document.getElementById('boxFilter').value;
+      const series = document.getElementById('seriesFilter').value;
 
       filteredList = legoList.filter(item => {
         const num = String(item['레고 품번'] || '').toLowerCase();
@@ -253,8 +278,9 @@
 
         const matchOwned = owned === 'ALL' || String(item['보유 여부'] || '').toUpperCase() === owned;
         const matchBox = box === 'ALL' || String(item['박스 여부'] || '').toUpperCase() === box;
+        const matchSeries = series === 'ALL' || String(item['시리즈'] || '미분류') === series;
 
-        return matchKeyword && matchOwned && matchBox;
+        return matchKeyword && matchOwned && matchBox && matchSeries;
       });
 
       // 기본적으로 세트 번호(품번) 오름차순으로 정렬 (숫자로 비교해서 76391 같은 번호도 자연스럽게 정렬됨)
@@ -365,6 +391,7 @@
       placeholder.style.display = 'none';
       img.onerror = () => { img.style.display = 'none'; placeholder.style.display = 'flex'; };
 
+      document.getElementById('detailSeries').innerText = item['시리즈'] || '미분류';
       document.getElementById('detailRetail').innerText = formatMoney(item['출시가']);
       document.getElementById('detailPurchase').innerText = formatMoney(item['매입가']);
       document.getElementById('detailBoxYn').innerText = item['박스 여부'] === 'O' ? '있음' : '없음';
@@ -420,6 +447,7 @@
         numInput.value = item['레고 품번'];
         numInput.readOnly = true; // 수정할 때는 세트 번호를 바꿀 수 없게 막기
         document.getElementById('inputName').value = item['레고명'] || '';
+        document.getElementById('inputSeries').value = item['시리즈'] || '미분류';
         document.getElementById('inputOwned').value = item['보유 여부'] || 'O';
         document.getElementById('inputBox').value = item['박스 여부'] || 'O';
         document.getElementById('inputRetail').value = item['출시가'] ? Number(item['출시가']).toLocaleString('ko-KR') : '';
@@ -429,6 +457,7 @@
       } else {
         document.getElementById('legoForm').reset();
         numInput.readOnly = false;
+        document.getElementById('inputSeries').value = '미분류';
       }
 
       updateFormPreview();
@@ -488,6 +517,7 @@
       const payload = {
         '레고 품번': document.getElementById('inputNumber').value,
         '레고명': document.getElementById('inputName').value,
+        '시리즈': document.getElementById('inputSeries').value,
         '보유 여부': document.getElementById('inputOwned').value,
         '박스 여부': document.getElementById('inputBox').value,
         '출시가': getRawNumber('inputRetail'),
